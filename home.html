@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <link rel="stylesheet" href="styles.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script type="text/javascript" src="index.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -12,14 +13,18 @@
         <div id="comper">
             <h1>COMPER</h1>
             <div id="music-info">
-                <p>SONG TITLE</p>
+                <h2>SONG TITLE</h2>
+                <span id="meter"><sup>#</sup>&frasl;<sub>#</sub></span>
+                <span id="music-note">♩= ###</span>
             </div>
             <div id="control-buttons" class="buttons">
-                <div class="material-icons">pause</div>
-                <div class="material-icons">play_arrow</div>
-                <div class="material-icons">stop</div>
-                <div class="material-icons">fiber_manual_record</div>
-                <div class="material-icons">repeat</div>
+                <button class="material-icons">play_arrow</button>
+                <button class="material-icons">pause</button>
+                <button class="material-icons">stop</button>
+                <button class="material-icons">fiber_manual_record</button>
+                <button class="material-icons">repeat</button>
+                <button class="material-icons">save</button>
+                <button class="material-icons">folder</button>
             </div>
             <div id="chords">
 

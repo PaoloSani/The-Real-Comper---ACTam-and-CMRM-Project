@@ -1,0 +1,62 @@
+#comper {
+  width: 1250px;
+  height: 900px;
+  background-color: rgb(58, 138, 164);
+  border-radius: 10px;
+  vertical-align: middle;
+  position: relative;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+h1 {
+  padding-top: 2%;
+  text-align: center;
+  width: 100%;
+}
+
+#music-info {
+  position: relative;
+  width: 200px;
+  height: 40px;
+  left: 6%;
+}
+
+#meter {
+  position: relative;
+  font-size: 30px;
+  vertical-align: top;
+  padding: 5%;
+}
+
+#music-note {
+  position: relative;
+  font-size: 30px;
+  width: 30px;
+  left: 10%;
+  vertical-align: top;
+}
+
+#control-buttons {
+  position: relative;
+  width: 400px;
+  height: 30px;
+  top: 2%;
+  left: 50%;
+  transform: translateX(-40%);
+  align-content: center;
+  vertical-align: middle;
+}
+
+button {
+  padding-inline: 2%;
+}
+
+#chords {
+  position: relative;
+  background-color: white;
+  width: 750px;
+  height: 400px;
+  top: 5%;
+  left: 5%;
+}
