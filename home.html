@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <link rel="stylesheet" href="styles.css">
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script type="text/javascript" src="index.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<!--        script for  pianoroll-->
+        <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0"></script>
         <script src='https://kit.fontawesome.com/a076d05399.js'></script>
         <link rel="stylesheet" href="chords_css.css">
         <meta charset="UTF-8">
@@ -14,10 +17,18 @@
         <div id="comper">
             <h1>COMPER</h1>
             <div id="music-info">
-                <p>SONG TITLE</p>
+                <h2>SONG TITLE</h2>
+                <span id="meter"><sup>#</sup>&frasl;<sub>#</sub></span>
+                <span id="music-note">♩= ###</span>
             </div>
             <div id="control-buttons" class="buttons">
-                <div id="add_button" class="material-icons">send</div>
+                <button class="material-icons">play_arrow</button>
+                <button class="material-icons">pause</button>
+                <button class="material-icons">stop</button>
+                <button class="material-icons">fiber_manual_record</button>
+                <button class="material-icons">repeat</button>
+                <button class="material-icons">save</button>
+                <button class="material-icons">folder</button>
             </div>
             <div id="chords">
                 <div id="chart-editor">
@@ -74,6 +85,29 @@
                 </div>
             </div>
             <div id="piano-roll">
+                <midi-visualizer
+                        type="waterfall"
+                        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
+                </midi-visualizer>
+                <midi-visualizer
+                        type="staff"
+                        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
+                </midi-visualizer>
+
+                <midi-player
+                        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid"
+                        sound-font visualizer="#piano-roll midi-visualizer" id="midi-player1">
+                </midi-player>
+
+                <svg>
+                    <defs>
+                        <linearGradient id="keyGradient" x1="15%" x2="0%" y1="0" y2="100%">
+                            <stop stop-color="black" offset="60%"/>
+                            <stop stop-color="grey" offset="99%"/>
+                            <!--       <stop stop-color="white" offset="101%" stop-opacity="0"/> -->
+                        </linearGradient>
+                    </defs>
+                </svg>
             </div>
         </div>
     </body>
