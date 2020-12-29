@@ -1,0 +1,89 @@
+#chords {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%);
+    width: 496px;
+    height: fit-content;
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+#chart-editor{
+    background-color: grey;
+    padding: 5px 10px;
+    border-radius: 5px;
+    position: relative;
+    width: fit-content;
+    height: fit-content;
+    right:0;
+}
+
+.modify_chart{
+    height: 25px;
+    width: 30px;
+    border-radius: 2px;
+    background-color: lightgrey;
+    display: inline-block;
+    text-align: center;
+    padding: 5px;
+}
+
+.chord-block{
+    position: relative;
+    background: antiquewhite;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin-left: 0;
+    margin-right: 0;
+    height: 124px;
+    width: 124px;
+    border-right: 1px solid rgba(0,0,0,.055);
+    border-bottom: 1px solid rgba(0,0,0,.055);
+}
+
+.chord-block.left {
+    border-radius: 4px 0 0 4px;
+}
+
+.chord-block .chord{
+    color: #73767c;
+    font-size: 20px;
+    padding-bottom: 6px;
+    text-align: center;
+}
+
+.chord-block.right {
+    border-radius: 0 4px 4px 0;
+    border-right: 0;
+}
+
+.chord-block .degree {
+    color: #9f9f9f;
+    font-size: 16px;
+    text-align: center;
+}
+
+.chart-line{
+    padding-right: 10px;
+    padding-left: 10px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.first-line{
+    padding-top: 5px;
+}
+
+.last-line{
+    border-bottom: 0;
+}
+
+.edit{
+    color: #73767c;
+    font-size: 16px;
+    position: absolute;
+    right: 10px;
+    top: 8px;
+}
