@@ -96,14 +96,20 @@ button {
   position: relative;
   background-color: white;
   width: 62vw;
-  height: 40vh;
+  /* height: 40vh; */
+  height: fit-content;
   top: 3%;
   left: 5%;
 }
 
 #piano-roll {
-  margin-top: 35px;
-  margin-left: 15px;
+  position: relative;
+  top: 5%;
+  left: 5%;
+}
+
+.waterfall-visualizer {
+  position: relative;
 }
 
 svg.waterfall-piano rect[original-fill="white"] {

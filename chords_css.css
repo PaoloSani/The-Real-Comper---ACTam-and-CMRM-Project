@@ -1,4 +1,4 @@
-#chords {
+/* #chords {
     position: relative;
     left: 50%;
     transform: translate(-50%);
@@ -6,7 +6,8 @@
     height: fit-content;
     padding-top: 15px;
     padding-bottom: 15px;
-}
+} */
+
 #chart-editor{
     background-color: grey;
     padding: 5px 10px;
