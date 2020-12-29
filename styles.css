@@ -60,3 +60,18 @@ button {
   top: 5%;
   left: 5%;
 }
+
+#piano-roll {
+  margin-top: 35px;
+  margin-left: 15px;
+}
+
+svg.waterfall-piano rect[original-fill="white"] {
+  /*stroke: lightsteelblue;*/
+  stroke: url(#keyGradient);
+
+}
+svg.waterfall-piano rect[original-fill="black"]:not(.active){
+  stroke: none;
+  fill: url(#keyGradient);
+}
