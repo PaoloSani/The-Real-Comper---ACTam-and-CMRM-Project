@@ -1,63 +1,103 @@
-#comper {
-  width: 1250px;
-  height: 900px;
+body {
+  margin: 0;
+  background:rgb(58, 138, 164);
+  color: #222;
+}
+
+div {
+  display: inline-block;
+}
+
+h1 {
+  padding-top: 0;
+  text-align: center;
+  width: 100%;
+}
+
+h2 {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+input {
+  height: 4vh;
+  width: 6vw;
+  vertical-align: middle;
+  font-size: 25px;
+  background-color:rgb(58, 138, 164);
+  border: transparent;
+}
+
+#music-info {
+  position: relative;
+  width: 230px;
+  height: 5vh;
+  left: 6%;
+}
+
+#meter-num {
+  height: 50%;
+  width: 10%;
+  vertical-align: middle;
+  font-size: 20px;
   background-color: rgb(58, 138, 164);
+  border: transparent;
+  padding: 0% ;
+}
+
+#comper {
+  width: 100vw;
+  height: 100vh;
+  padding: 10px;
   border-radius: 10px;
   vertical-align: middle;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-}
-
-h1 {
-  padding-top: 2%;
-  text-align: center;
-  width: 100%;
-}
-
-#music-info {
-  position: relative;
-  width: 200px;
-  height: 40px;
-  left: 6%;
+  overflow: scroll;
 }
 
 #meter {
   position: relative;
   font-size: 30px;
   vertical-align: top;
-  padding: 5%;
+  padding: 3%;
 }
 
 #music-note {
   position: relative;
   font-size: 30px;
   width: 30px;
+  height: 5vh;
   left: 10%;
   vertical-align: top;
 }
 
 #control-buttons {
   position: relative;
-  width: 400px;
-  height: 30px;
-  top: 2%;
-  left: 50%;
-  transform: translateX(-40%);
+  width: 40vw;
+  height: 7vh;
+  top: 1%;
+  left: 13%;
+  /* transform: translateX(-50%); */
   align-content: center;
   vertical-align: middle;
 }
 
 button {
   padding-inline: 2%;
+  padding-left: 0.8%;
+  width: 4vw;
+  height: 4vh;
+  border-radius: 4px;
 }
 
 #chords {
   position: relative;
   background-color: white;
-  width: 750px;
-  height: 400px;
-  top: 5%;
+  width: 62vw;
+  height: 40vh;
+  top: 3%;
   left: 5%;
 }
 
