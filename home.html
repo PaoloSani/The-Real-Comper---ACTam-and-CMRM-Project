@@ -2,6 +2,10 @@
 <html lang="en">
     <head>
         <link rel="stylesheet" href="styles.css">
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet">
+
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         <script type="text/javascript" src="index.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -15,31 +19,44 @@
 
     <body>
         <div id="comper">
-            <h1>COMPER</h1>
+            <h1>Comper & Voicings</h1>
             <div id="music-info">
                 <h2>SONG TITLE</h2>
-                <span id="meter"><sup>#</sup>&frasl;<sub>#</sub></span>
-                <span id="music-note">♩= ###</span>
+                <select id="meters" name="meters">
+                    <option value="3/4">3/4</option>
+                    <option value="4/4" selected="selected">4/4</option>
+                    <option value="5/4">5/4</option>
+                    <option value="7/8">7/8</option>
+                    <option value="9/8">9/8</option>
+                    <option value="15/16">15/16</option>
+                    <option value="17/16">17/16</option>
+                </select>
+                <span id="music-note">
+                    ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" value="90" title="Enter the tempo desired.">
+                </span>
             </div>
-            <div id="control-buttons" class="buttons">
+            <div id="control-buttons">
                 <button class="material-icons">play_arrow</button>
                 <button class="material-icons">pause</button>
                 <button class="material-icons">stop</button>
                 <button class="material-icons">fiber_manual_record</button>
                 <button class="material-icons">repeat</button>
                 <button class="material-icons">save</button>
-                <button class="material-icons">folder</button>
+                <input type="file" id="a-file" accept=".mid" hidden="hidden" />
+                <button class="material-icons" id="folder-btn">folder</button>
+                <script type="text/javascript" src="./buttons.js"></script>
             </div>
+            <br>
             <div id="chords">
-                <div id="chart-editor">
-                    <div class="modify_chart">
+                <span id="chart-editor">
+                    <button id="modify_chart">
                         <i class="material-icons">add</i>
-                    </div>
-                    <div class="modify_chart">
-                        <div class="material-icons">remove</div>
-                    </div>
-                </div>
-                <div id="chart">
+                    </button>
+                    <button id="modify_chart">
+                        <i class="material-icons">remove</i>
+                    </button>
+                </span>
+                <span id="chart">
                     <div class="chart-line first-line">
                         <div class="chord-block left">
                             <i class="fas fa-edit edit"></i>
@@ -82,8 +99,9 @@
                             <div class="degree ">Tritone of V</div>
                         </div>
                     </div>
-                </div>
+                </span>
             </div>
+            <br>
             <div id="piano-roll">
                 <midi-visualizer
                         type="waterfall"
