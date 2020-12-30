@@ -1,11 +1,41 @@
 //no comment
 const teoria = require("teoria");
 
-var chord = teoria.note('C');
+
+function meterToIntArray(string){
+    var array = string.split('/');
+
+    return array.map(i => parseInt(i));
+}
+
+const metersSet = [
+    {
+        signatures_set: ['4/4', '17/16', '5/4'],
+        slot: 4,
+    },
+    {
+        signatures_set: ['3/4', '7/8'],
+        slot: 3,
+    },
+    {
+        signatures_set: ['5/4'],
+        slot: 5,
+    },
+    {
+        signatures_set: ['7/4'],
+        slot: 7,
+    },
+]
+
 
 class Chord {
        constructor(chord, tonality) {
-           this.chord = chord;
+           if ( chord == null ){
+                this._chord = null;
+           }
+           else {
+               this.chord = chord;
+           }
            this.tonality = tonality;
        }
 
@@ -27,30 +57,81 @@ class Chord {
     }
 }
 
-var firstChord = new Chord('Cmin9', 'F major');
 
-class bar{
-    constructor(type) {
-        this.array = [];
-        this.type = type;
+
+class Song{
+    constructor(title) {
+        this.meterType = 0;
+        this.meter = meterToIntArray(metersSet[0].signatures_set[0]);
+        this.bpm = 120;
+        this.glob_tonality = 'C major';
+        this.createChart();
+        this._title = title;
+
     }
 
-    createBar(){
-        for(var  i = 0; i < this.type; i++) {
-            let p = new Chord('C', 'C major');
-            this.array.push(p);
+    addBar(){
+        for ( let i = 0; i < metersSet[this.meterType].slot; i++){
+            var c = new Chord(null, this.glob_tonality);
+            this._chart.push(c);
         }
     }
 
-    get allChords(){
-        return this.array;
+    removeBar(){
+        for ( let i = 0; i < metersSet[this.meterType].slot; i++){
+            this._chart.pop();
+        }
     }
+
+    createChart(){
+        this.addBar();
+    }
+
+    get Chart(){
+        return this._chart;
+    }
+
+    get meterType(){
+        return this._meterType;
+    }
+
+    set meterType(value){
+        this._meterType = value;
+    }
+
+    get glob_tonality(){
+        return this._tonality;
+    }
+
+    set glob_tonality(value){
+        this._tonality = teoria.scale(value.split(' ')[0], value.split(' ')[1]);
+    }
+
+    set meter(value) {
+        this._meter = value;
+    }
+
+    set bpm(value) {
+        this._bpm = value;
+    }
+
+    set title(value) {
+        this._title = value;
+    }
+
+    get meter(){
+        return this._meter;
+    }
+
+    get bpm(){
+        return this._bpm;
+    }
+
+    get title() {
+        return this._title;
+    }
+
 }
 
-var newBar = new bar(4);
+var newSong = new Song('The Girl from Ipanema');
 
-newBar.createBar()
-
-var chords_in_a_bar = newBar.allChords;
-
-(chords_in_a_bar.forEach(i => console.log(i.chord.notes().toString())))
