@@ -12,16 +12,19 @@ h1 {
   padding-top: 0;
   text-align: center;
   width: 100%;
+  /* font-family: cursive; */
+  font-family: 'Parisienne', cursive;
+  font-size: 50px;
 }
 
 h2 {
   margin-bottom: 0;
   width: 100%;
+  font-family:'Courier New', Courier, monospace;
 }
 
 input {
   height: 4vh;
-  width: 6vw;
   vertical-align: middle;
   font-size: 25px;
   background-color:rgb(58, 138, 164);
@@ -35,9 +38,19 @@ input {
   left: 6%;
 }
 
+select {
+  top: 25%;
+  width: 70px;
+  height: 30px;
+  font-size: 25px;
+  position: relative;
+  background-color:rgb(58, 138, 164);
+  border: transparent;
+}
+
 #meter-num {
   height: 50%;
-  width: 10%;
+  width: 11%;
   vertical-align: middle;
   font-size: 20px;
   background-color: rgb(58, 138, 164);
@@ -67,7 +80,7 @@ input {
 #music-note {
   position: relative;
   font-size: 30px;
-  width: 30px;
+  width: 60px;
   height: 5vh;
   left: 10%;
   vertical-align: top;
@@ -78,10 +91,11 @@ input {
   width: 40vw;
   height: 7vh;
   top: 1%;
-  left: 13%;
-  /* transform: translateX(-50%); */
+  left: 50%;
+  transform: translateX(-70%);
   align-content: center;
   vertical-align: middle;
+  /* text-align: center; */
 }
 
 button {
@@ -92,20 +106,26 @@ button {
   border-radius: 4px;
 }
 
+button:hover {
+  color:darkgrey;
+}
+
 #chords {
   position: relative;
-  background-color: white;
-  width: 62vw;
-  /* height: 40vh; */
+  background-color: rgb(58, 138, 164);
+  border-radius: 3px;
+  width: fit-content;
   height: fit-content;
   top: 3%;
-  left: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
 }
 
 #piano-roll {
   position: relative;
-  top: 5%;
-  left: 5%;
+  top: 7%;
+  text-align: center;
 }
 
 .waterfall-visualizer {
