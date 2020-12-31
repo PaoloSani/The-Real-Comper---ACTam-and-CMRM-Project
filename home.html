@@ -1,19 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
+        <!-- Styles -->
         <link rel="stylesheet" href="styles.css">
-        
+        <link rel="stylesheet" href="chords_css.css">
+        <link rel="stylesheet" href="new_song.css">
+            <!-- Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com">
         <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet">
-
+            <!-- Icons -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        
+        <!-- Scripts -->
         <script type="text/javascript" src="index.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-<!--        script for  pianoroll-->
+            <!-- Pianoroll -->
         <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0"></script>
         <script src='https://kit.fontawesome.com/a076d05399.js'></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/saebekassebil/teoria/teoria.js"></script>
-        <link rel="stylesheet" href="chords_css.css">
+       
+
         <meta charset="UTF-8">
         <title>Comper</title>
     </head>
@@ -26,16 +32,16 @@
                 <div>
                     <label>Meter:</label>
                     <select id="meters" name="meters">
-                        <optgroup label="A">
+                        <optgroup label="Group A">
                             <option value="4/4" selected="selected">4/4</option>
                             <option value="17/16">17/16</option>
                             <option value="5/4">5/4</option>
                         </optgroup>
-                        <optgroup label="B">
+                        <optgroup label="Group B">
                             <option value="3/4">3/4</option>
                             <option value="7/8">7/8</option>
                         </optgroup>
-                        <optgroup label="C">
+                        <optgroup label="Group C">
                             <option value="5/4">5/4</option>
                         </optgroup>
                     </select>
@@ -47,6 +53,7 @@
                         ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" value="90" title="Enter the tempo desired.">
                     </span>
                 </div>
+                <br>
                 <div>
                     <label id="key">Key:</label>
                     <select id="keys" name="key">
@@ -65,17 +72,79 @@
                     </select>
                 </div>
             </div>
+            <br>
             <div id="control-buttons">
-                <button class="material-icons">play_arrow</button>
-                <button class="material-icons">pause</button>
-                <button class="material-icons">stop</button>
-                <button class="material-icons">fiber_manual_record</button>
-                <button class="material-icons">repeat</button>
-                <button class="material-icons">save</button>
+                <div id="new" class="button">
+                    <i class="material-icons">add</i>
+                    <div class="name">New</div>
+                </div>
+                <div id="play" class="button">
+                    <i class="material-icons">play_arrow</i>
+                    <div class="name">Play</div>
+                </div>
+                <div id="pause" class="button">
+                    <i class="material-icons">pause</i>
+                    <div class="name">Pause</div>
+                </div>
+                <div id="stop" class="button">
+                    <i class="material-icons">stop</i>
+                    <div class="name">Stop</div>
+                </div>
+                <div id="record" class="button">
+                    <i class="material-icons">fiber_manual_record</i>
+                    <div class="name">Record</div>
+                </div>
+                <div id="repeat" class="button">
+                    <i class="material-icons">repeat</i>
+                    <div class="name">Repeat</div>
+                </div>
+                <div id="save" class="button">
+                    <i class="material-icons">save</i>
+                    <div class="name">Save</div>
+                </div>
                 <input type="file" id="a-file" accept=".mid" hidden="hidden" />
-                <button class="material-icons" id="folder-btn">folder</button>
-                <script type="text/javascript" src="./buttons.js"></script>
+                <div id="open" class="button">
+                    <i class="material-icons" id="folder-btn">folder</i>
+                    <div class="name">Open</div>
+                </div>                
             </div>
+            <!-- The Modal -->
+            <div id="myModal" class="modal">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+                    <div class="modal-header">
+                        <p>Add Song parameters</p>
+                    </div>
+                    <div class="modal-body">
+                        <div id="new-title">
+                            <label>Song Title</label>
+                            <input id="song-title" type="text">
+                        </div>
+                        <br>
+                        <div id="new-meter">
+                            <label>Meter</label>
+                            <input id="song-meter" type="text">
+                        </div>
+                        <br>
+                        <div id="new-tempo">
+                            <label>Tempo</label>
+                            <input id="song-tempo" type="text">
+                        </div>
+                        <br>
+                        <div id="new-key">
+                            <label>Key</label>
+                            <input id="song-key" type="text">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Load React. -->
+            <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+            <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+            <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+            <!-- Control buttons -->
+            <script type="text/javascript" src="./buttons.js"></script>
             <br>
             <div id="chords">
                 <span id="chart-editor">
@@ -160,3 +229,4 @@
         </div>
     </body>
 </html>
+
