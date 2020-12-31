@@ -7,7 +7,7 @@
         <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet">
 
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-        <script type="text/javascript" src="index.js"></script>
+
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <!--        script for  pianoroll-->
         <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0"></script>
@@ -48,59 +48,8 @@
                 <script type="text/javascript" src="./buttons.js"></script>
             </div>
             <br>
-            <div id="chords">
-                <span id="chart-editor">
-                    <button id="modify_chart">
-                        <i class="material-icons">add</i>
-                    </button>
-                    <button id="modify_chart">
-                        <i class="material-icons">remove</i>
-                    </button>
-                </span>
-                <span id="chart">
-                    <div class="chart-line first-line">
-                        <div class="chord-block left">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord left">Fmaj7</div>
-                            <div class="degree left">I</div>
-                        </div>
-                        <div class="chord-block">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord">%</div>
-                        </div>
-                        <div class="chord-block">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">G7</div>
-                            <div class="degree ">V/V</div>
-                        </div>
-                        <div class="chord-block right">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord right">%</div>
-                        </div>
-                    </div>
-                    <div class="chart-line ">
-                        <div class="chord-block left last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord left">Gmin7</div>
-                            <div class="degree left">II</div>
-                        </div>
-                        <div class="chord-block last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">Gb7</div>
-                            <div class="degree ">Tritone of V</div>
-                        </div>
-                        <div class="chord-block last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">Fmaj7</div>
-                            <div class="degree ">I</div>
-                        </div>
-                        <div class="chord-block right last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">Gb7</div>
-                            <div class="degree ">Tritone of V</div>
-                        </div>
-                    </div>
-                </span>
+            <div id = "chords">
+
             </div>
             <br>
             <div id="piano-roll">
@@ -129,5 +78,7 @@
                 </svg>
             </div>
         </div>
+        <script type="text/javascript" src="index.js"></script>
+        <script type="text/javascript" src="chartView.js"></script>
     </body>
 </html>

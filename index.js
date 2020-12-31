@@ -134,5 +134,3 @@ class Song{
 }
 
 var newSong = new Song('The Girl from Ipanema');
-
-console.log(newSong);
