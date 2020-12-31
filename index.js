@@ -65,14 +65,14 @@ class Song{
         this.meter = meterToIntArray(metersSet[0].signatures_set[0]);
         this.bpm = 120;
         this.glob_tonality = 'C major';
+        this._chart = [];
         this.createChart();
         this._title = title;
-
     }
 
     addBar(){
         for ( let i = 0; i < metersSet[this.meterType].slot; i++){
-            var c = new Chord(null, this.glob_tonality);
+            let c = new Chord(null, this.glob_tonality.tonic.name() + ' ' + this.glob_tonality.name);
             this._chart.push(c);
         }
     }
@@ -135,3 +135,4 @@ class Song{
 
 var newSong = new Song('The Girl from Ipanema');
 
+console.log(newSong);
