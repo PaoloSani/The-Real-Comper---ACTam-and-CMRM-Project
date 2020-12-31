@@ -22,18 +22,47 @@
             <h1>Comper & Voicings</h1>
             <div id="music-info">
                 <h2>SONG TITLE</h2>
-                <select id="meters" name="meters">
-                    <option value="3/4">3/4</option>
-                    <option value="4/4" selected="selected">4/4</option>
-                    <option value="5/4">5/4</option>
-                    <option value="7/8">7/8</option>
-                    <option value="9/8">9/8</option>
-                    <option value="15/16">15/16</option>
-                    <option value="17/16">17/16</option>
-                </select>
-                <span id="music-note">
-                    ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" value="90" title="Enter the tempo desired.">
-                </span>
+                <div>
+                    <label>Meter:</label>
+                    <select id="meters" name="meters">
+                        <optgroup label="A">
+                            <option value="4/4" selected="selected">4/4</option>
+                            <option value="17/16">17/16</option>
+                            <option value="5/4">5/4</option>
+                        </optgroup>
+                        <optgroup label="B">
+                            <option value="3/4">3/4</option>
+                            <option value="7/8">7/8</option>
+                        </optgroup>
+                        <optgroup label="C">
+                            <option value="5/4">5/4</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <br>
+                <div>
+                    <label>Tempo:</label>
+                    <span id="music-note">
+                        ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" value="90" title="Enter the tempo desired.">
+                    </span>
+                </div>
+                <div>
+                    <label id="key">Key:</label>
+                    <select id="keys" name="key">
+                        <option value="C" selected="select">C</option>
+                        <option value="C#/Db">C#/Db</option>
+                        <option value="D">D</option>
+                        <option value="D#/Eb">D#/Eb</option>
+                        <option value="E">E</option>
+                        <option value="F">F</option>
+                        <option value="F#/Gb">F#/Gb</option>
+                        <option value="G">G</option>
+                        <option value="G#/Ab">G#/Ab</option>
+                        <option value="A">A</option>
+                        <option value="A#/Bb">A#/Bb</option>
+                        <option value="B">B</option>
+                    </select>
+                </div>
             </div>
             <div id="control-buttons">
                 <button class="material-icons">play_arrow</button>
