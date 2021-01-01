@@ -74,39 +74,7 @@
             </div>
             <br>
             <div id="control-buttons">
-                <div id="new" class="button">
-                    <i class="material-icons">add</i>
-                    <div class="name">New</div>
-                </div>
-                <div id="play" class="button">
-                    <i class="material-icons">play_arrow</i>
-                    <div class="name">Play</div>
-                </div>
-                <div id="pause" class="button">
-                    <i class="material-icons">pause</i>
-                    <div class="name">Pause</div>
-                </div>
-                <div id="stop" class="button">
-                    <i class="material-icons">stop</i>
-                    <div class="name">Stop</div>
-                </div>
-                <div id="record" class="button">
-                    <i class="material-icons">fiber_manual_record</i>
-                    <div class="name">Record</div>
-                </div>
-                <div id="repeat" class="button">
-                    <i class="material-icons">repeat</i>
-                    <div class="name">Repeat</div>
-                </div>
-                <div id="save" class="button">
-                    <i class="material-icons">save</i>
-                    <div class="name">Save</div>
-                </div>
-                <input type="file" id="a-file" accept=".mid" hidden="hidden" />
-                <div id="open" class="button">
-                    <i class="material-icons" id="folder-btn">folder</i>
-                    <div class="name">Open</div>
-                </div>                
+                <!-- React components -->
             </div>
             <!-- The Modal -->
             <div id="myModal" class="modal">
@@ -139,12 +107,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Load React. -->
-            <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
-            <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
-            <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
-            <!-- Control buttons -->
-            <script type="text/javascript" src="./buttons.js"></script>
             <br>
             <div id="chords">
                 <span id="chart-editor">
@@ -227,6 +189,12 @@
                 </svg>
             </div>
         </div>
+        <!-- Load React. -->
+        <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+        <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
+        <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
+        <!-- Control buttons -->
+        <script type="text/javascript" src="./buttons.js"></script>
     </body>
 </html>
 
