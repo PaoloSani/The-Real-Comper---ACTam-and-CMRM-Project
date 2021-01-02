@@ -12,21 +12,23 @@ h1 {
   padding-top: 0;
   text-align: center;
   width: 100%;
-  /* font-family: cursive; */
   font-family: 'Parisienne', cursive;
   font-size: 50px;
+  margin-top: 5%;
+  margin-bottom: 0;
 }
 
 h2 {
-  margin-bottom: 0;
+  margin: auto;
   width: 100%;
+  font-size: 30px;
   font-family:'Courier New', Courier, monospace;
 }
 
-input {
+#bpm {
   height: 4vh;
   vertical-align: middle;
-  font-size: 25px;
+  font-size: 18px;
   background-color:rgb(58, 138, 164);
   border: transparent;
 }
@@ -35,17 +37,39 @@ input {
   position: relative;
   width: 230px;
   height: 5vh;
-  left: 6%;
+  top: 5%;
+  left: 10%;
+}
+
+label {
+  position: relative;
+  top: 1%;
+  font-size: 18px;
 }
 
 select {
-  top: 25%;
-  width: 70px;
-  height: 30px;
-  font-size: 25px;
   position: relative;
+  width: 50px;
+  height: 30px;
+  top: 25%;
+  left: 10%;
+  font-size: 18px;
   background-color:rgb(58, 138, 164);
   border: transparent;
+}
+
+select:hover {
+  cursor: pointer;
+}
+
+#key {
+  position: relative;
+  left: 3%;
+}
+
+#keys {
+  position: relative;
+  left: 23%;
 }
 
 #meter-num {
@@ -70,44 +94,55 @@ select {
   overflow: scroll;
 }
 
-#meter {
+#meters {
   position: relative;
-  font-size: 30px;
-  vertical-align: top;
-  padding: 3%;
+  top: 5%;
+}
+
+#tempo {
+  position: relative;
+  vertical-align: baseline;
+  top: 5%;
 }
 
 #music-note {
   position: relative;
-  font-size: 30px;
+  font-size: 20px;
   width: 60px;
   height: 5vh;
-  left: 10%;
-  vertical-align: top;
 }
 
 #control-buttons {
   position: relative;
-  width: 40vw;
+  width: fit-content;
   height: 7vh;
-  top: 1%;
   left: 50%;
-  transform: translateX(-70%);
-  align-content: center;
+  transform: translateX(-50%);
+  margin: auto;
   vertical-align: middle;
-  /* text-align: center; */
+  padding: 5px;
+  border: 1px solid #FFF;
+  color: #000;
+  border-radius: 5px;
+  top: -5%;
 }
 
-button {
-  padding-inline: 2%;
-  padding-left: 0.8%;
-  width: 4vw;
-  height: 4vh;
-  border-radius: 4px;
+.button {
+  padding-right: 5px;
+  padding-left: 5px;
+  text-align: center;
 }
 
-button:hover {
+.button:hover {
   color:darkgrey;
+  cursor: pointer;
+}
+
+.name {
+  position: relative;
+  top: 5px;
+  font-size: 14px;
+  display: table;
 }
 
 #chords {
