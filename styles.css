@@ -4,7 +4,7 @@ body {
   color: #222;
 }
 
-div {
+#music-info, #control-buttons, #ctrl-btns div:not(.name) {
   display: inline-block;
 }
 
@@ -29,7 +29,7 @@ h2 {
   height: 4vh;
   vertical-align: middle;
   font-size: 18px;
-  background-color:rgb(58, 138, 164);
+  background-color: transparent;
   border: transparent;
 }
 
@@ -48,13 +48,11 @@ label {
 }
 
 select {
-  position: relative;
   width: 50px;
   height: 30px;
   top: 25%;
   left: 10%;
   font-size: 18px;
-  background-color:rgb(58, 138, 164);
   border: transparent;
 }
 
@@ -70,6 +68,8 @@ select:hover {
 #keys {
   position: relative;
   left: 23%;
+  width: 6vw;
+  background-color: transparent;
 }
 
 #meter-num {
@@ -97,6 +97,7 @@ select:hover {
 #meters {
   position: relative;
   top: 5%;
+  background-color: transparent;
 }
 
 #tempo {
