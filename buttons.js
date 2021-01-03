@@ -30,7 +30,7 @@ function SongInfo() {
 					{meters_options.map(
 						(mtrs) =>
 						<optgroup key={mtrs.group} label={mtrs.group}>
-							{ mtrs.values.map((vals) => 
+							{ mtrs.values.map((vals) =>
 								<option value={vals}>{vals}</option>
 							)}
 						</optgroup>
@@ -178,6 +178,7 @@ function Buttons(props) {
 		</div>
 	)
 }
+
 function Ctrls() {
 	const [lastClick, setLastClick] = useState("")
 

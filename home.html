@@ -12,7 +12,6 @@
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
         
         <!-- Scripts -->
-        <script type="text/javascript" src="index.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
             <!-- Pianoroll -->
         <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0"></script>
@@ -25,107 +24,15 @@
     </head>
 
     <body>
-        <div id="comper">
-            <h1>Comper & Voicings</h1>
-            <div id="music-info">
-                <!-- Ract components from buttons.js -->
-            </div>
-            <br>
-            <div id="control-buttons">
-                <!-- React components from buttons.js -->
-            </div>
-            <!-- The Modal -->
-            <div id="myModal" class="modal">
-                <!-- React components from buttons.js -->
-            </div>
-            <br>
-            <div id="chords">
-                <span id="chart-editor">
-                    <button id="modify_chart">
-                        <i class="material-icons">add</i>
-                    </button>
-                    <button id="modify_chart">
-                        <i class="material-icons">remove</i>
-                    </button>
-                </span>
-                <span id="chart">
-                    <div class="chart-line first-line">
-                        <div class="chord-block left">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord left">Fmaj7</div>
-                            <div class="degree left">I</div>
-                        </div>
-                        <div class="chord-block">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord">%</div>
-                        </div>
-                        <div class="chord-block">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">G7</div>
-                            <div class="degree ">V/V</div>
-                        </div>
-                        <div class="chord-block right">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord right">%</div>
-                        </div>
-                    </div>
-                    <div class="chart-line ">
-                        <div class="chord-block left last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord left">Gmin7</div>
-                            <div class="degree left">II</div>
-                        </div>
-                        <div class="chord-block last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">Gb7</div>
-                            <div class="degree ">Tritone of V</div>
-                        </div>
-                        <div class="chord-block last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">Fmaj7</div>
-                            <div class="degree ">I</div>
-                        </div>
-                        <div class="chord-block right last-line">
-                            <i class="fas fa-edit edit"></i>
-                            <div class="chord ">Gb7</div>
-                            <div class="degree ">Tritone of V</div>
-                        </div>
-                    </div>
-                </span>
-            </div>
-            <br>
-            <div id="piano-roll">
-                <midi-visualizer
-                        type="waterfall"
-                        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
-                </midi-visualizer>
-                <midi-visualizer
-                        type="staff"
-                        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
-                </midi-visualizer>
-
-                <midi-player
-                        src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid"
-                        sound-font visualizer="#piano-roll midi-visualizer" id="midi-player1">
-                </midi-player>
-
-                <svg>
-                    <defs>
-                        <linearGradient id="keyGradient" x1="15%" x2="0%" y1="0" y2="100%">
-                            <stop stop-color="black" offset="60%"/>
-                            <stop stop-color="grey" offset="99%"/>
-                            <!--       <stop stop-color="white" offset="101%" stop-opacity="0"/> -->
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
-        </div>
+        <div id="comper"></div>
         <!-- Load React. -->
         <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
         <script src="https://unpkg.com/react@17/umd/react.development.js" crossorigin></script>
         <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js" crossorigin></script>
         <!-- Control buttons -->
-        <script type="text/javascript" src="./buttons.js"></script>
+        <!--<script type="text/javascript" src="./buttons.js"></script>-->
+        <script type="text/javascript" src="index.js"></script>
+        <script type="text/javascript" src="chartView.js"></script>
     </body>
 </html>
 

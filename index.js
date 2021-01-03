@@ -8,20 +8,24 @@ function meterToIntArray(string){
     return array.map(i => parseInt(i));
 }
 
-const metersSet = [
+const meters_options = [
     {
+        group: 'Group A',
         signatures_set: ['4/4', '17/16', '5/4'],
         slot: 4,
     },
     {
+        group: 'Group B',
         signatures_set: ['3/4', '7/8'],
         slot: 3,
     },
     {
+        group: 'Group C',
         signatures_set: ['5/4'],
         slot: 5,
     },
     {
+        group: 'Group D',
         signatures_set: ['7/4'],
         slot: 7,
     },
@@ -43,6 +47,10 @@ class Chord {
         return this._chord;
     }
 
+    notes(){
+           return this.chord.notes();
+    }
+
     set chord(value) {
         this._chord = teoria.chord(value);
     }
@@ -61,8 +69,8 @@ class Chord {
 
 class Song{
     constructor(title) {
-        this.meterType = 0;
-        this.meter = meterToIntArray(metersSet[0].signatures_set[0]);
+        this.meterType = meters_options[0];
+        this.meter = meterToIntArray(meters_options[0].signatures_set[0]);
         this.bpm = 120;
         this.glob_tonality = 'C major';
         this._chart = [];
@@ -71,14 +79,14 @@ class Song{
     }
 
     addBar(){
-        for ( let i = 0; i < metersSet[this.meterType].slot; i++){
-            let c = new Chord(null, this.glob_tonality.tonic.name() + ' ' + this.glob_tonality.name);
+        for ( let i = 0; i < this.meterType.slot; i++){
+            let c = new Chord('Cmaj7', this.glob_tonality.tonic.name() + ' ' + this.glob_tonality.name);
             this._chart.push(c);
         }
     }
 
     removeBar(){
-        for ( let i = 0; i < metersSet[this.meterType].slot; i++){
+        for ( let i = 0; i < this.meterType.slot; i++){
             this._chart.pop();
         }
     }
@@ -89,6 +97,10 @@ class Song{
 
     get Chart(){
         return this._chart;
+    }
+
+    set Chart(value){
+        this._chart = value;
     }
 
     get meterType(){
@@ -131,6 +143,11 @@ class Song{
         return this._title;
     }
 
+    render(songObject){
+        songObject.chartModel.push(this._chart[1].chord.name)
+        return songObject
+    }
 }
 
-var newSong = new Song('The Girl from Ipanema');
+module.exports = meters_options
+module.exports = Song

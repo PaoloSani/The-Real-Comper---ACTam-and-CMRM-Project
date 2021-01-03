@@ -8,11 +8,16 @@
     padding-bottom: 15px;
 } */
 
+#wrapper{
+    display: block;
+}
+
 #chart-editor{
     background-color:rgb(58, 138, 164); /* grey;*/
     padding: 5px 10px;
     border-radius: 5px;
-    position: relative;
+    display: block;
+    position: absolute;
     width: fit-content;
     height: fit-content;
 }
@@ -36,8 +41,8 @@
     justify-content: center;
     margin-left: 0;
     margin-right: 0;
-    height: 124px;
-    width: 124px;
+    height: 100px;
+    width: 100px;
     border-right: 1px solid rgba(0,0,0,.055);
     border-bottom: 1px solid rgba(0,0,0,.055);
 }
@@ -58,6 +63,10 @@
     border-right: 0;
 }
 
+.end-bar{
+    border-left: 2px solid black;
+}
+
 .chord-block .degree {
     color: #9f9f9f;
     font-size: 16px;
@@ -68,17 +77,10 @@
     padding-right: 10px;
     padding-left: 0px;
     display: flex;
-    justify-content: center;
     width: 100%;
 }
 
-.first-line{
-    padding-top: 5px;
-}
 
-.last-line{
-    border-bottom: 0;
-}
 
 .edit{
     color: #73767c;

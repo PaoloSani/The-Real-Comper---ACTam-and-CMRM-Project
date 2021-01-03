@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "core-decorators": "^0.20.0",
     "index.js": "0.0.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.1"
