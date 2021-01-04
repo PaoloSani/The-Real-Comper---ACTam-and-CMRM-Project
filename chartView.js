@@ -95,7 +95,7 @@ function ChordChart(){
     const updateStates = () => {
         setChartModel([...chart.chartModel])
         setChartDegree([...chart.chartDegree])
-        setSlotModel([...chart.slotModel])
+        setSlotModel(chart.slotModel)
         setMidiNoteState([...chart.MIDInote])
     }
 
@@ -159,7 +159,7 @@ function ChordChart(){
                 </button>
             </div>
             <div id="chart">
-                {printChart(chartModel, chartDegree, midiNoteState)}
+                {printChart(chartModel, chartDegree, midiNoteState, slotModel)}
             </div>
         </div>
     )

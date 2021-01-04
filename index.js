@@ -116,7 +116,7 @@ class Song{
 
     exportSongChart(chartObject){
         // updating chartObject properties
-        chartObject.chartModel = this.Chart.map( i => i.chord.name)
+        chartObject.chartModel = this.Chart.map( i => i.chord.name )
         chartObject.chartDegree = this.Chart.map( i => {
                 var deg = i.chord.root.scaleDegree(this.glob_tonality)
                 if (deg == 0) {
