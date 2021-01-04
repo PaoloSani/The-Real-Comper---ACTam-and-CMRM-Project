@@ -4,7 +4,7 @@ body {
   color: #222;
 }
 
-#music-info, #control-buttons, #ctrl-btns div:not(.name) {
+#music-info, #ctrl-btns div:not(.name) {
   display: inline-block;
 }
 
@@ -67,7 +67,7 @@ select:hover {
 
 #keys {
   position: relative;
-  left: 23%;
+  left: 10%;
   width: 6vw;
   background-color: transparent;
 }
@@ -98,6 +98,7 @@ select:hover {
   position: relative;
   top: 5%;
   background-color: transparent;
+  left: 5%;
 }
 
 #tempo {
@@ -111,21 +112,21 @@ select:hover {
   font-size: 20px;
   width: 60px;
   height: 5vh;
+  left: 2%;
 }
 
 #control-buttons {
   position: relative;
   width: fit-content;
   height: 7vh;
-  left: 50%;
-  transform: translateX(-50%);
   margin: auto;
   vertical-align: middle;
   padding: 5px;
   border: 1px solid #FFF;
   color: #000;
   border-radius: 5px;
-  top: -5%;
+  display: -webkit-box;
+  /* margin-top: 8vh; */
 }
 
 .button {
