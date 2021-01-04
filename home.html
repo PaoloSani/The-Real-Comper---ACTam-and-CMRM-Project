@@ -12,9 +12,8 @@
         <script src="https://cdn.jsdelivr.net/combine/npm/tone@14.7.58,npm/@magenta/music@1.21.0/es6/core.js,npm/focus-visible@5,npm/html-midi-player@1.1.0"></script>
         <script src='https://kit.fontawesome.com/a076d05399.js'></script>
         <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/saebekassebil/teoria/teoria.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/erossignon/serialijse/dist/serialijse.bundle.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/iconico/JavaScript-Serializer/src/serializer.js"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/iconico/JavaScript-Serializer/src/serializer-js.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.2.0/firebase-app.js"></script>
+        <script type="text/javascript" src="https://www.gstatic.com/firebasejs/7.2.0/firebase-firestore.js"></script>
         <!--        <script type="text/javascript" src="node_modules/teoria/index.js"></script>-->
         <script type="text/javascript" src="index.js"></script>
         <link rel="stylesheet" href="chords_css.css">
@@ -46,7 +45,7 @@
                 <button class="material-icons">stop</button>
                 <button class="material-icons">fiber_manual_record</button>
                 <button class="material-icons">repeat</button>
-                <button class="material-icons">save</button>
+                <button id="save" class="material-icons">save</button>
                 <input type="file" id="a-file" accept=".mid" hidden="hidden" />
                 <button class="material-icons" id="folder-btn">folder</button>
                 <script type="text/javascript" src="./buttons.js"></script>

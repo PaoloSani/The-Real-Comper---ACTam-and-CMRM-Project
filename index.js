@@ -1,10 +1,18 @@
-//no comment
 const teoria = require("teoria");
+import 'regenerator-runtime/runtime'
 
-const serializable = require('tanagra-core').serializable
-
-// questo era per una prova di fare serializble manualmente
-// import * as knowledge from "./dist/teoria.2206f598";
+// Your web app's Firebase configuration
+var firebaseConfig = {
+    apiKey: "AIzaSyDtryKgIopVUA44Y1F28yBuaN2aFyrgXLg",
+    authDomain: "comper-8f4b6.firebaseapp.com",
+    projectId: "comper-8f4b6",
+    storageBucket: "comper-8f4b6.appspot.com",
+    messagingSenderId: "724927156",
+    appId: "1:724927156:web:452ca1acf1ed382e3b8de1"
+};
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+var db = firebase.firestore()
 
 function meterToIntArray(string){
     var array = string.split('/');
@@ -12,85 +20,120 @@ function meterToIntArray(string){
     return array.map(i => parseInt(i));
 }
 
-const metersSet = [
+const meters_options = [
     {
+        group: 'Group A',
         signatures_set: ['4/4', '17/16', '5/4'],
         slot: 4,
     },
     {
+        group: 'Group B',
         signatures_set: ['3/4', '7/8'],
         slot: 3,
     },
     {
+        group: 'Group C',
         signatures_set: ['5/4'],
         slot: 5,
     },
     {
+        group: 'Group D',
         signatures_set: ['7/4'],
         slot: 7,
     },
 ]
 
-
 class Chord {
-       constructor(chord, tonality) {
-           if ( chord == null ){
-                this._chord = null;
-               this.chord = 'Cmaj';
-               // giusto per gaver qualcosa
-           }
-           else {
-               this.chord = chord;
-           }
-           this.tonality = tonality;
-       }
+
+    constructor(chord, tonality) {
+        this.chord = chord;
+        this.tonality = tonality;
+    }
 
     get chord() {
         return this._chord;
     }
 
+    // value can be either a string or a chord obj
     set chord(value) {
-        this._chord = teoria.chord(value);
+        if(!(value instanceof teoria.Chord)){
+            !(value == null) ? this._chord = teoria.chord(value) : this._chord = teoria.chord('Cmaj');
+        }else{
+            this._chord = value;
+        }
     }
-
 
     get tonality() {
         return this._tonality;
     }
 
     set tonality(value) {
-        this._tonality = teoria.scale(value.split(' ')[0], value.split(' ')[1]);
+        if(!(value instanceof teoria.Scale)){
+            this._tonality = teoria.scale(value.split(' ')[0], value.split(' ')[1]);
+        }else{
+            this._tonality = value;
+        }
     }
 }
 
 
 
 class Song{
-    constructor(title) {
-        this.meterType = 0;
-        this.meter = meterToIntArray(metersSet[0].signatures_set[0]);
-        this.bpm = 120;
-        this.glob_tonality = 'C major';
+    constructor(title, meter, bpm, tonality) {
+        this.meter = meterToIntArray(meter || meters_options[0].signatures_set[0]);
+        this.meterType = meters_options[0];
+        this.bpm = bpm || 120;
+        this.glob_tonality = tonality || 'C major';
         this._chart = [];
-        this.createChart();
+        this.addBar()
         this._title = title;
     }
 
     addBar(){
-        for ( let i = 0; i < metersSet[this.meterType].slot; i++){
+        for ( let i = 0; i < this.meterType.slot; i++){
             var c = new Chord(null, this.glob_tonality.tonic.name() + ' ' + this.glob_tonality.name);
             this._chart.push(c);
         }
     }
 
     removeBar(){
-        for ( let i = 0; i < metersSet[this.meterType].slot; i++){
+        for ( let i = 0; i < this.meterType.slot; i++){
             this._chart.pop();
         }
     }
 
-    createChart(){
-        this.addBar();
+    exportSimplifiedSong(songInfo, chartObject){
+
+        // updating songInfo properties
+        songInfo.title = this.title
+        songInfo.meterType = this.meterType
+        songInfo.meter = this.meter[0] + '/' + this.meter[1]
+        songInfo.bpm = this.bpm
+        songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + ' ' + this.glob_tonality.name
+
+        // updating chartObject properties
+        chartObject.chartModel = this.Chart.map( i => i.chord.name)
+        chartObject.chartDegree = this.Chart.map( i => {
+                var deg = i.chord.root.scaleDegree(this.glob_tonality)
+                if (deg == 0) {
+                    var interval = i.chord.root.interval(this.glob_tonality.tonic)
+                    deg = (interval.number()%7).toString() + interval.quality()
+                    if (deg == '1d') deg = '1A' // to fix that dimished octave become an augmented 1
+                }
+                return deg.toString()
+                    .replace('1', 'I')
+                    .replace('2', 'II')
+                    .replace('3', 'III')
+                    .replace('4', 'IV')
+                    .replace('5', 'V')
+                    .replace('6', 'VI')
+                    .replace('7', 'VII')
+            })
+        chartObject.slotModel = this.meterType.slot
+        chartObject.MIDInote = this.Chart.map( i => {
+            return i.chord.notes().map(i => i.midi())
+        })
+
     }
 
     get Chart(){
@@ -141,132 +184,149 @@ class Song{
 
 }
 
-// Mark class `Song` as serializable and containing sub-types teoria e compagnia
-module.exports = serializable(Song, [Chord, teoria.Chord, teoria.Note, teoria.Interval, teoria.Scale])//, [
-module.exports = serializable(Song)//, [
-//     // previous versions of the class
-//     [Bar, Baz, FooBar], // this version also references FooBar
-//     [FooBarBaz]         // this version references a different type altogether, FooBarBaz
-// ])
 
 
-var newSong = new Song('The Girl from Ipanema');
-// console.log(newSong)
+// @param a Song instance to be saved to a file
+function saveSongTofile(songInstance){
 
-
-function ChordExt(tonalita){
-    this.tonalita = tonalita;
-}
-
-//tentativo estensione classe teoria.Chord
-// teoria.chord(teoria.note('a')).notes().forEach( i => console.log(i.name()) )
-// ChordExt.prototype = teoria.Chord.prototype;
-// ChordExt.prototype = Object.create(teoria.Chord.prototype);
-// ChordExt.prototype = Object.create(teoria.chord(teoria.note('Amaj')));
-// ChordExt.prototype = Object.create(teoria.chord(teoria.note('A')));
-// ciao = new ChordExt('c minore')
-// console.log(ciao.root.name()) //A, come varibile di proto
-// console.log(ciao.root = teoria.note('b')) //qua al posto di cambiare la cosa di proto, crea una nuova
-// // infatti lo dice proprio qua
-// // https://javascript.info/prototype-inheritance#writing-doesn-t-use-prototype
-// console.log(dir(ciao)) //e qua infatti possiamo vedere questa cosa
-
-//meglio metterlo dentro class Song ?
-function saveSong(songIstance){
-    console.log('saving song ', songIstance.title);
-    console.log('saving song ', songIstance);
-    localStorage.setItem(songIstance.title, JSON.stringify(songIstance));
-    let str = JSON.stringify(songIstance, function replacer (key, value){
-        console.log('value', value)
-        // value.
-    })
+    console.log('saving song ', songInstance.title);
+    // localStorage.setItem(songInstance.title, JSON.stringify(songInstance));
+    var blob = new Blob( [JSON.stringify(songInstance)], {
+        type: 'application/octet-stream'
+    });
+    var url = URL.createObjectURL( blob );
+    var link = document.createElement( 'a' );
+    link.id = 'downloadTag';
+    link.href = url;
+    link.download = songInstance.title + '.json';
+    link.click();
+    window.URL.revokeObjectURL(url);
 
 }
 
-function loadSong(songTitle){ //song title is the string with the filename
-    var parsedSong = JSON.parse(localStorage.getItem(songTitle));
+//@param String containing filename
+//@return a Song obj
+/*async*/ function loadSong(songTitle) {
 
-    // console.log(parsedSong); // ovviamente non mi salva i metodi
-    var instance = new Song(songTitle);
-    Object.assign(instance, parsedSong);
-    //now we have to manually "istanciate" every internal class,
-    // in particular tonality, and all the bars in chords array
+    //note: even if Synchronous XMLHttpRequest is deprecated, it gives me only a warning and not an error
+    console.log('loading song ', songTitle);
+    var parsedSong;
 
-    console.log('instance of the class for the moment: ', instance )
-    console.log('tonic', instance.glob_tonality.tonic )
-    console.log('this', instance )
-    // console.log(teoria.Note.prototype.name.call(instance.glob_tonality.tonic, instance.glob_tonality))
+    // make the http request to get the json file
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            parsedSong = JSON.parse(xhttp.responseText);
+        }
+    };
+    xhttp.open("GET", "presets/" + songTitle+ ".json", false);
+    xhttp.send();
 
-    function nameOfTonic(Note) {
-        console.log(Note.coord[1])
-        return knowledge.fifths[Note.coord[1] + knowledge.A4[1] ] //- accidentalValue(Note) * 7 + 1];
+    // const request = async () => {
+    //     const response = await fetch("presets/" + songTitle+ ".json");
+    //     const json = await response.json();
+    //     return json;
+    // }
+    // parsedSong = await request();
+
+    // fetch('./presets/The Girl from Ipanema.json').then(result => result.json()).then(console.log);
+
+    // var parsedSong = JSON.parse(localStorage.getItem(songTitle));
+    // parsedSong = parseFromFirebase(songTitle)
+    // console.log('parsedSong', parsedSong)
+    var instance = new Song(songTitle); //just to have all methods and submethod
+    Object.assign(instance, parsedSong); //instance is now a Song class obj with methods, but not submethods
+
+    instance.glob_tonality = deserializeScale(parsedSong._tonality)
+
+    instance._chart = instance.Chart.map(parsedChord => deserializeChordClass(parsedChord))
+
+    function deserializeScale(parsedScale) {
+        return teoria.Scale(deserializeNote(parsedScale.tonic), parsedScale.name);
     }
-    function accidentalValue(Note) {
-        return Math.round((Note.coord[1] + knowledge.A4[1] - 2) / 7);
+
+    function deserializeNote(parsedNote) {
+        return teoria.Note(parsedNote.coord, parsedNote.duration);
     }
 
-    //CASIN
-    // todo
-    // fare una funzione (nel file principale questo qua js) in cui gli si passa una scala, ma cosí come viene
-    // jsonata (parsata).
-    // fare sub function ausiliarie per trasformare da parsed a tone.note con tutti i metodi del caso
-    // usare questa per trsaformare da scala a istanza di scala. se serve poi di chord. bisognerá fare un for loop
-    // buon anno
-    console.log('catch this trick', nameOfTonic(instance.glob_tonality.tonic))
+    function deserializeChordClass(parsedChord) {
+        return new Chord(parsedChord._chord.name, deserializeScale(parsedChord._tonality));
+    }
 
-    // teoria.Note.prototype.name.call(
-
-    console.log('am I stupid, or what?')
-    let asdasd = teoria.scale('A', 'minor');
-    console.log('dummy tonality shuold be complete', asdasd);
-
-    let dummyTonalityIstancee = teoria.scale('A', 'minor');
-    console.log('dummy tonality shuold be complete', dummyTonalityIstancee);
-
-    console.log('instantlly generated scale', teoria.scale('A', 'minor'));
-    Object.assign(dummyTonalityIstancee, instance.glob_tonality);
-    console.log('dummy tonality', dummyTonalityIstancee);
-    instance.glob_tonality = dummyTonalityIstancee;
-    instance.glob_tonality = instance.glob_tonality.tonic.name() + ' ' + instance.glob_tonality.name
-    console.log('pre returned song', instance);
+    console.log('loaded song: ', instance)
     return instance;
-
-    //to set new tonality we can create a scale with data parsed, or we could create a use Object.assign()
-    // don't know if it works
-    // let's find out
-    // xe un problema: ci sono molte sottoclassi
-    // si potrebbe modificare il costruttore
 }
 
 
-// saveSong(newSong);
-// console.log('loaded song', loadSong('The Girl from Ipanema'));
+//button function handler
+window.onload = function(){
+    document.getElementById("save").addEventListener("click", () => saveSongTofile(newSong));
+
+    const folder_btn = document.getElementById("folder-btn");
+    folder_btn.addEventListener("click", function() {
+        // getSongList();
+        // real_btn.click();
+        loadSong("The Girl from Ipanema")
+    });
+};
 
 
-// Seerialijse
-// var str = serialijse.serialize(newSong);
-// var so = serialijse.deserialize(str);
-// console.log(so)
+function getSongList(){
+    console.log('getSongList called')
+    fetch('./presets/Preset list.json') //per ora non esiste il file
+        .then(result =>result.json())
+        .then(console.log)
+}
 
-// tangara
-// --------------------------------------------
-// tanagra deserializer test
-// const json = require('tanagra-json') // alternatively, `require('tanagra-protobuf')`
-// const auto = require('tanagra-auto-mapper') // alternatively, `require('tanagra-protobuf')`
-// json.init()                          // `await json.init()` if you're using `tanagra-protobuf`
-// const encoded = json.encodeEntity(newSong)
-// const decoded = json.decodeEntity(encoded, Song)
-// // non funziona
-// console.log('decoded', decoded)
-// console.log('auto generated', auto.generateTypeMap(ChordExt))
-//----------------------------------------------
 
-// JavaScript-Serializer
-//----------------------------------------------
-// https://github.com/iconico/JavaScript-Serializer
-// objSerializer = new JSSerializer();
-// objSerializer.Serialize(newSong);
-// var strJS = objSerializer.GetJSString('dematerilizedSong');
-// eval(strJS)
-// console.log(strJS)
-//----------------------------------------------
+async function saveToFirebase(songInstance) {
+
+    console.log('saving song to firebase');
+    db.collection("songs").doc(songInstance.title).update(
+        {
+            songJson: JSON.stringify(songInstance)
+        },
+    );
+
+}
+
+// string of the song
+function parseFromFirebase(songTitle) {
+
+    return db.collection("songs").doc(songTitle).get().then(function(doc){
+        console.log('parsed from firebase', JSON.parse(doc.data().songJson));
+        return JSON.parse(doc.data().songJson)
+    });
+
+}
+
+
+
+// ----------------------------------------------------------------------------
+// example / testing program
+
+
+// create a new song
+var newSong = new Song('The Girl from Ipanema', '5/4', 130, 'C major');
+console.log(newSong);
+
+// create obj for react
+let songInfo ={};
+let chart = {};
+
+// update those obj
+newSong.exportSimplifiedSong(songInfo, chart)
+
+// print (a copy!) of the obj just populated
+console.log('songInfo', JSON.parse(JSON.stringify(songInfo)))
+console.log('chart', JSON.parse(JSON.stringify(chart)))
+
+console.log('.....\n\n\n\n....')
+// load a new song from local
+newSong = /*await*/ loadSong('The Girl from Ipanema awkward')
+
+
+// setTimeout(newSong.exportSimplifiedSong(songInfo, chart),2000)
+newSong.exportSimplifiedSong(songInfo, chart)
+console.log('songInfo', songInfo)
+console.log('chart', chart)
