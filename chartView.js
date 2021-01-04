@@ -9,10 +9,9 @@ const Song = require('./index.js')
 const meters_options = [{
     group: 'Group A',
     values: ['4/4', '17/16', '5/4']
-}, {
-    group: 'Group B',
-    values: ['3/4', '7/8']
-}, {
+}, {group: 'Group B',
+        values: ['3/4', '7/8'],
+    }, {
     group: 'Group C',
     values: ['5/4']
 }];
@@ -60,102 +59,93 @@ var song = new Song('prova');
 
 song.Chart[1].chord='Dmin7'
 
-let chartObject = {
-    chartModel : ['Cmaj7', 'Amin7', 'Dmin7', 'Db7'],
-    tonalityModel : ['C' ,'major'],
-    slotModel : 4,
-}
+let songInfo ={};
+let chart = {};
 
-let songInfo = {
-    title: 'The Girl From Ipanema',
-    meterType: meters_options[0],
-    meter: '4/4',
-    bpm: 120,
-    glob_tonality: 'C major',
-}
+// update those obj
+song.exportSongInfo(songInfo)
+song.exportSongChart(chart)
+
+
+
+// <ChordBlock name = {name} index = {index} slot = {slotModel} degree={degree} midi={midi} />
 
 function ChordBlock(props){
-    const [chordState, setChordState] = useState(() => props.chord)
-    const [tonality, setTonality] = useState(() => props.tonality)
 
     const editChord = () => {
 
     }
 
-    const createTeoriaChord = (chord, tonality) => {
-        var chordToPrint = new teoria.chord(chord);
-        let name = chordToPrint.name;
-        let degree = chordToPrint.root.scaleDegree(teoria.scale(tonality[0], tonality[1]));
 
-        return (
-            <div>
-                <div className={"chord"}>{name}</div>
-                <div className={"degree"}>{degree}</div>
-            </div>
-        )
-    }
     return (
-        <div className={ (props.index % props.slot === 0) ? "chord-block end-bar" : "chord-block"}>
+        <div className={ (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block"} >
             <i className="fas fa-edit edit" onClick={editChord}></i>
-            {createTeoriaChord(chordState, tonality)}
+            <div className={"chord"}>{props.name}</div>
+            <div className={"degree"}>{props.degree}</div>
         </div>
     )
 }
 
 function ChordChart(){
-    const [chartState, setChart] = useState( () => chartObject.chartModel )
-    const [tonality, setTonality] = useState( () => chartObject.tonalityModel )
-    const [slot, setSlot] = useState( () => chartObject.slotModel )
+    const [chartModel, setChartModel] = useState( () => chart.chartModel )
+    const [chartDegree, setChartDegree] = useState(() => chart.chartDegree)
+    const [slotModel, setSlotModel] = useState( () => chart.slotModel )
+    const [midiNoteState, setMidiNoteState] = useState( () => chart.MIDInote)
 
-    const render = () => {
-        for ( let i = 0; i < slot; i++ ){
-            chartModel.push('Cmaj7')
-        }
+    const updateStates = () => {
+        setChartModel([...chart.chartModel])
+        setChartDegree([...chart.chartDegree])
+        setSlotModel([...chart.slotModel])
+        setMidiNoteState([...chart.MIDInote])
     }
 
     const addBar = () => {
         song.addBar()
-
-        chartObject = song.render(chartObject)
-        setChart([...chartObject.chartModel])
-    }
-
-    const printChord = (chord, index) => {
-        return (
-            <ChordBlock chord = {chord} index = {index} slot = {slot} tonality={tonality} />
-        )
+        song.exportSongChart(chart)
+        updateStates()
     }
 
     const removeBar =  () => {
         song.removeBar()
-        chartObject = song.render(chartObject)
-        setChart([...chartObject.chartModel])
+        song.exportSongChart(chart)
+        updateStates()
     }
 
-    const printLine = (i, array) =>{
+    const printChord = (name, index, degree, midi) => {
         return (
-            <div id={"line" + i} className={"chart-line"}>{array.map( (i, index) => printChord(i, index))} </div>
+        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi}/>
         )
     }
 
-    const printChart = (chart) => {
-        var size = slot*4
-        var lines = Math.ceil(chart.length/(size))
+    const printLine = (lineIndex, namesPerLine, degreesPerLine, midiPerLine) =>{
+        return (
+            <div id={"line" + lineIndex} className={"chart-line"}>
+                {namesPerLine.map((i, index) => printChord(i, index + lineIndex*slotModel*4, degreesPerLine[index], midiPerLine[index]))}
+            </div>
+        )
+    }
+
+    const printChart = () => {
+        let size = slotModel*4
+        let lines = Math.ceil(chartModel.length/(size))
         const arr = Array.from({length: lines}, (_, index) => index + 1);
 
-        var arrayOfLines = [];
+        let namesPerLine = [];
+        let degreesPerLine = [];
+        let midiPerLine = [];
 
-        for (var i=0; i< chart.length; i+=size) {
-            arrayOfLines.push(chart.slice(i, i + size));
+        for (let i=0; i< chartModel.length; i+=size) {
+            namesPerLine.push(chartModel.slice(i, i + size));
+            degreesPerLine.push(chartDegree.slice(i, i + size));
+            midiPerLine.push(midiNoteState.slice(i, i + size));
         }
-        return arr.map( (i, index)=> printLine(index, arrayOfLines[index]))
-
+        return arr.map( (i, index)=> printLine(index, namesPerLine[index], degreesPerLine[index], midiPerLine[index]))
     }
 
     useEffect(
         () =>{
-            console.log(chartObject)
-        }, [chartState]
+            console.log(chart)
+        }, [chartModel]
     )
 
     return (
@@ -169,7 +159,7 @@ function ChordChart(){
                 </button>
             </div>
             <div id="chart">
-                {printChart(chartState)}
+                {printChart(chartModel, chartDegree, midiNoteState)}
             </div>
         </div>
     )
@@ -246,7 +236,6 @@ function NewSongInfo() {
 
 /* ---------- Functions to add Control Buttons ---------- */
 function Buttons(props) {
-
     return(
         <div id="btns">
             { props.btn.id === "open" ?
@@ -265,7 +254,6 @@ function Buttons(props) {
 
 function Ctrls() {
     const [lastClick, setLastClick] = useState("")
-
     return(
         <div id="control-buttons">
             {bank.map(

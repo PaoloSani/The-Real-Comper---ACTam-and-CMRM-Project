@@ -11,9 +11,10 @@ var firebaseConfig = {
     messagingSenderId: "724927156",
     appId: "1:724927156:web:452ca1acf1ed382e3b8de1"
 };
+
 // Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-var db = firebase.firestore()
+// firebase.initializeApp(firebaseConfig);
+// var db = firebase.firestore()
 
 function meterToIntArray(string){
     var array = string.split('/');
@@ -103,7 +104,7 @@ class Song{
         }
     }
 
-    exportSimplifiedSong(songInfo, chartObject){
+    exportSongInfo(songInfo) {
 
         // updating songInfo properties
         songInfo.title = this.title
@@ -111,7 +112,9 @@ class Song{
         songInfo.meter = this.meter[0] + '/' + this.meter[1]
         songInfo.bpm = this.bpm
         songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + ' ' + this.glob_tonality.name
+    }
 
+    exportSongChart(chartObject){
         // updating chartObject properties
         chartObject.chartModel = this.Chart.map( i => i.chord.name)
         chartObject.chartDegree = this.Chart.map( i => {
@@ -129,7 +132,7 @@ class Song{
                     .replace('5', 'V')
                     .replace('6', 'VI')
                     .replace('7', 'VII')
-            })
+                })
         chartObject.slotModel = this.meterType.slot
         chartObject.MIDInote = this.Chart.map( i => {
             return i.chord.notes().map(i => i.midi())
@@ -202,7 +205,6 @@ function saveSongTofile(songInstance){
     link.download = songInstance.title + '.json';
     link.click();
     window.URL.revokeObjectURL(url);
-
 }
 
 //@param String containing filename
@@ -222,8 +224,7 @@ function saveSongTofile(songInstance){
     };
     xhttp.open("GET", "presets/" + songTitle+ ".json", false);
     xhttp.send();
-module.exports = meters_options
-module.exports = Song
+
 
     // const request = async () => {
     //     const response = await fetch("presets/" + songTitle+ ".json");
@@ -305,34 +306,35 @@ function parseFromFirebase(songTitle) {
 
 
 
-// ----------------------------------------------------------------------------
-// example / testing program
+// // ----------------------------------------------------------------------------
+// // example / testing program
+//
+//
+// // create a new song
+// var newSong = new Song('The Girl from Ipanema', '5/4', 130, 'C major');
+// console.log(newSong);
+//
+// // create obj for react
+// let songInfo ={};
+// let chart = {};
+//
+// // update those obj
+// newSong.exportSimplifiedSong(songInfo, chart)
+//
+// // print (a copy!) of the obj just populated
+// console.log('songInfo', JSON.parse(JSON.stringify(songInfo)))
+// console.log('chart', JSON.parse(JSON.stringify(chart)))
+//
+// console.log('.....\n\n\n\n....')
+// // load a new song from local
+// newSong = /*await*/ loadSong('The Girl from Ipanema awkward')
+//
+//
+// // setTimeout(newSong.exportSimplifiedSong(songInfo, chart),2000)
+// newSong.exportSimplifiedSong(songInfo, chart)
+// console.log('songInfo', songInfo)
+// console.log('chart', chart)
 
-
-// create a new song
-var newSong = new Song('The Girl from Ipanema', '5/4', 130, 'C major');
-console.log(newSong);
-
-// create obj for react
-let songInfo ={};
-let chart = {};
-
-// update those obj
-newSong.exportSimplifiedSong(songInfo, chart)
-
-// print (a copy!) of the obj just populated
-console.log('songInfo', JSON.parse(JSON.stringify(songInfo)))
-console.log('chart', JSON.parse(JSON.stringify(chart)))
-
-console.log('.....\n\n\n\n....')
-// load a new song from local
-newSong = /*await*/ loadSong('The Girl from Ipanema awkward')
-
-
-// setTimeout(newSong.exportSimplifiedSong(songInfo, chart),2000)
-newSong.exportSimplifiedSong(songInfo, chart)
-console.log('songInfo', songInfo)
-console.log('chart', chart)
 
 module.exports = meters_options
 module.exports = Song
