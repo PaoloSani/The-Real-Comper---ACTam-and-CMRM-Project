@@ -1,14 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 const teoria = require("teoria");
+import Modal from 'react-modal';
 
-const { useState, useEffect} = React
+
+const { useState, useEffect, useRef} = React
 
 const Song = require('./index.js')
 
 const meters_options = [{
     group: 'Group A',
-    values: ['4/4', '17/16', '5/4']
+    values: ['4/4', '17/16', '5/4'],
 }, {group: 'Group B',
         values: ['3/4', '7/8'],
     }, {
@@ -55,9 +57,29 @@ const bank = [{
     name: 'Open'
 }];
 
+const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', 'custom']
+
+
+const customStyles = {
+    content : {
+        top                   : '50%',
+        left                  : '50%',
+        right                 : 'auto',
+        bottom                : 'auto',
+        marginRight           : '-50%',
+        transform             : 'translate(-50%, -50%)',
+        backgroundColor       : 'antique-white',
+    }
+};
+
+
 var song = new Song('prova');
 
-song.Chart[1].chord='Dmin7'
+
+song.Chart[0].chord='C6/9'
+song.Chart[1].chord='Am7'
+song.Chart[2].chord='Dm7'
+song.Chart[3].chord='G7'
 
 let songInfo ={};
 let chart = {};
@@ -67,15 +89,117 @@ song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
 
 
+function ChordEditor(props){
+    const [isOpen, setIsOpen] = useState(false)
+    const [selRoot, setSelRoot] = useState(() => props.chord.name)
+    const [selType, setSelType] = useState(() => chord_type[0])
+    const [customSel, setCustomSel] = useState( () => "")
 
-// <ChordBlock name = {name} index = {index} slot = {slotModel} degree={degree} midi={midi} />
+    const closeModal = () => {
+        updateSong()
+        setIsOpen(false)
+    }
+
+    const updateSong = () => {
+        var chord
+        if ( selType === 'custom'){
+            chord = customSel
+        }
+        else {
+            chord = selRoot+selType
+        }
+
+        props.closeEditor(false, 0, chord.slice())
+    }
+
+    const initializeModal = () => {
+        let chord = props.chord;
+        let type = chord.slice(1)
+        chord = chord[0];
+        setSelRoot(chord)
+        if ( chord_type.includes(type)){
+            setSelType(type)
+        }
+        else {
+            setSelType('custom')
+            setCustomSel(chord+type)
+        }
+    }
+
+    const handleClick = (content, isChordRoot) => {
+        const takeInput = document.getElementById("custom-chord");
+        takeInput.style.display = "none";
+        if ( isChordRoot ){
+            setSelRoot(content)
+        }
+        else {
+            setSelType(content)
+            if ( content === 'custom' ) {
+                takeInput.style.display = "block";
+                takeInput.addEventListener("keyup", function (event) {
+                    if (event.key === "Enter") {
+                        const newInput = document.getElementById("custom-chord-input").value;
+                        setCustomSel(newInput)
+                    }
+                });
+            }
+
+        }
+    }
+
+    const printRootOptions = (content) => {
+        return (
+            <div className={selRoot === content ? "meter-btn selected" : "meter-btn"} onClick={() =>handleClick(content, true)}>{content}</div>
+        )
+    }
+
+    const printTypeOptions = (content) => {
+        return (
+            <div className={selType === content ? "meter-btn selected" : "meter-btn"} onClick={() => handleClick(content, false)}>{content}</div>
+        )
+    }
+
+    useEffect(
+        () =>{
+            if ( props.isOpen ) {
+                setIsOpen( true )
+            }
+        }, [props.isOpen]
+    )
+
+    useEffect(
+        () => {
+            if ( customSel !== props.chord){
+                closeModal()
+            }
+        }, [customSel]
+    )
+
+    return(
+        <>
+            <Modal isOpen={isOpen} style={customStyles} ariaHideApp={false} onAfterOpen={initializeModal} onRequestClose={closeModal} >
+                <button onClick={closeModal}>x</button>
+                <p>Note</p>
+                <div className={"mtr-cntr"}>
+                    {key_options.map((i) => printRootOptions(i))}
+                </div>
+                <p>Chord Type</p>
+                <div className={"mtr-cntr"}>
+                    {chord_type.map((i) => printTypeOptions(i))}
+                </div>
+                <div id="custom-chord" style={{display: 'none'}}>
+                    <label htmlFor="">Enter custom chord</label> <input id="custom-chord-input" type="text" /><br/>
+                </div>
+            </Modal>
+        </>
+    )
+}
 
 function ChordBlock(props){
 
     const editChord = () => {
-
+        props.openEditor(true, props.index);
     }
-
 
     return (
         <div className={ (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block"} >
@@ -86,11 +210,14 @@ function ChordBlock(props){
     )
 }
 
-function ChordChart(){
+function ChordChart(props){
     const [chartModel, setChartModel] = useState( () => chart.chartModel )
     const [chartDegree, setChartDegree] = useState(() => chart.chartDegree)
     const [slotModel, setSlotModel] = useState( () => chart.slotModel )
     const [midiNoteState, setMidiNoteState] = useState( () => chart.MIDInote)
+    const [openModal, setOpenModal] = useState( () => false)
+    const [newChord, setNewChord] = useState( () => "")
+    const [indexOfChord, setIndex] = useState( () => 0)
 
     const updateStates = () => {
         setChartModel([...chart.chartModel])
@@ -113,7 +240,7 @@ function ChordChart(){
 
     const printChord = (name, index, degree, midi) => {
         return (
-        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi}/>
+        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor}/>
         )
     }
 
@@ -124,6 +251,7 @@ function ChordChart(){
             </div>
         )
     }
+
 
     const printChart = () => {
         let size = slotModel*4
@@ -144,9 +272,36 @@ function ChordChart(){
 
     useEffect(
         () =>{
-            console.log(chart)
-        }, [chartModel]
+            if ( newChord !== ""){
+                song.modifyChord(newChord, indexOfChord)
+                song.exportSongChart(chart)
+                updateStates()
+            }
+        }, [openModal, newChord]
     )
+
+    useEffect(
+        () =>{
+            if ( props.updateNewSong ){
+                song.exportSongChart(chart)
+                updateStates()
+            }
+        }, [props.updateNewSong]
+    )
+
+
+    const openEditor = (state, index, chord) => {
+        if ( state ){
+            let chord = chartModel[index]
+            setIndex(index)
+            setNewChord(chord)
+        }
+        else {
+            setNewChord(chord)
+        }
+
+        setOpenModal(state)
+    }
 
     return (
         <div id="chords">
@@ -158,6 +313,7 @@ function ChordChart(){
                     <i className="material-icons" >remove</i>
                 </button>
             </div>
+            <ChordEditor isOpen={openModal} closeEditor={openEditor} chord={newChord}/>
             <div id="chart">
                 {printChart(chartModel, chartDegree, midiNoteState, slotModel)}
             </div>
@@ -370,7 +526,7 @@ function SongComponent(){
             <NewSongInfo />
             
             <br/>
-            <ChordChart />
+            <ChordChart key={glob_tonality}/>
             <br/>
 
             <div id="piano-roll">

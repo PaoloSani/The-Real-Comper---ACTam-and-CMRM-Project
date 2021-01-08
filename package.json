@@ -2,10 +2,13 @@
   "dependencies": {
     "core-decorators": "^0.20.0",
     "index.js": "0.0.3",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1"
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
+    "react-onclickoutside": "^6.9.0",
+    "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
+    "react-modal": "^3.12.1",
     "teoria": "^2.5.0"
   }
 }

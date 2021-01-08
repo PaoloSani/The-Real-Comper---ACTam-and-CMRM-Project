@@ -186,6 +186,10 @@ class Song{
         return this._title;
     }
 
+    modifyChord(chord, index){
+        this._chart[index].chord = chord;
+    }
+
 }
 
 
