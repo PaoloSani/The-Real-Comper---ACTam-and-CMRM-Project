@@ -1,16 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 const teoria = require("teoria");
-import Modal from 'react-modal';
+const { useState, useEffect} = React
+// const Song = require('./index.js')
+import { db, Song } from "./index";
+import Modal from "react-modal";
 
-
-const { useState, useEffect, useRef} = React
-
-const Song = require('./index.js')
 
 const meters_options = [{
     group: 'Group A',
-    values: ['4/4', '17/16', '5/4'],
+    values: ['4/4', '17/16', '5/4']
 }, {group: 'Group B',
         values: ['3/4', '7/8'],
     }, {
@@ -83,7 +82,7 @@ song.Chart[3].chord='G7'
 
 let songInfo ={};
 let chart = {};
-
+var songList = []
 // update those obj
 song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
@@ -201,6 +200,7 @@ function ChordBlock(props){
         props.openEditor(true, props.index);
     }
 
+
     return (
         <div className={ (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block"} >
             <i className="fas fa-edit edit" onClick={editChord}></i>
@@ -251,7 +251,6 @@ function ChordChart(props){
             </div>
         )
     }
-
 
     const printChart = () => {
         let size = slotModel*4
@@ -390,8 +389,120 @@ function NewSongInfo() {
     )
 }
 
+function LoadSongModal(props){
+    const [modalSongList, setModalSongList] = useState(() => songList)
+    const [isOpen, setIsOpen] = useState(() => false)
+
+
+    const closeModal = () => {
+        setIsOpen(false)
+        props.setModalCaller(false)
+    }
+
+    useEffect(
+        () => {
+            if (props.isOpen){
+                setIsOpen(true)
+                Promise.all([
+                    Song.getSongList('presets'),
+                    Song.getSongList('songs')
+                ]).then(promiseArray => {
+                        songList = []
+                        // console.log(promiseArray)
+                        promiseArray.forEach((docList, docListIndex) => {
+                            songList.push(docListIndex)
+                            docList.forEach(song => songList.push(song.data()._title))
+                        });
+                    }
+                )
+                    // .then(() => console.log('finito di caricare', songList))
+                    .then(() => setModalSongList([...songList]))
+            }
+        }, [props.isOpen]
+    )
+
+    // loadAllSongs()
+
+
+        // .then(setModalSongList(songList))
+        // .then(() => setVariable(songList))
+    // .then(setVariable( songList.map(song => console.log(song._title))));
+
+    function setVariable(list) {
+        console.log(list)
+        setTimeout(() => setModalSongList(list), 10000)
+    }
+
+
+    return (
+        <Modal id="loadSongModal" isOpen={isOpen} onRequestClose={closeModal} /*className={'modal'}*/>
+                <span className="close" onClick={closeModal}>&times;</span>
+                <div className="modal-header">
+                    <p>Load a new song</p>
+                </div>
+                <ul id="songList">
+                    {
+                        modalSongList.map((songTitle, index) => {
+                            return(
+                                <li id={'songListElement' + index}
+                                    onClick={ /*!(songTitle === 0 | songTitle === 1) && ( () => alert('')) }*/
+                                        (songTitle === 0 | songTitle === 1) ?
+                                            undefined
+                                        :(
+                                            () => alert('selected song ' + index)
+                                        )
+                                    }
+                                    className={
+                                            (songTitle === 0 | songTitle === 1) ? "songCollection" : "songTitle"
+                                    }
+                                >
+                                    {
+                                        (songTitle === 0 | songTitle === 1) ? (
+                                            songTitle === 0 ? "Presets" : "Songs"
+                                        ):(
+                                            songTitle
+                                        )
+                                    }
+                                </li>
+                            )
+                        })
+                    }
+                </ul>
+        </Modal>
+    )
+}
+
 /* ---------- Functions to add Control Buttons ---------- */
 function Buttons(props) {
+
+    function Actions(id) {
+        if(id === "new") {
+            PopupWindow()
+        } else if(id === "play") {
+            null
+        } else if(id === "pause") {
+            null
+        } else if(id === "stop") {
+            handleClick()
+        } else if(id === "record") {
+            null
+        } else if(id === "repeat") {
+            null
+        } else if(id === "save") {
+            Song.loadFromFirebase('The Girl from Ipanema').then(songObj => song = songObj).then(() => {
+                console.log('loaded song from firebase')
+                song.exportSongInfo(songInfo)
+                song.exportSongChart(chart)
+                console.log(songInfo)
+                console.log(chart)
+            })
+        } else if(id === "open") {
+            // PopupWindow2()
+            props.openModal(true)
+            // OpenFile()
+        }
+    }
+
     return(
         <div id="btns">
             { props.btn.id === "open" ?
@@ -408,38 +519,19 @@ function Buttons(props) {
     )
 }
 
-function Ctrls() {
+function Ctrls(props) {
     const [lastClick, setLastClick] = useState("")
+
     return(
         <div id="control-buttons">
             {bank.map(
                 (btn) =>
-                    <Buttons key={btn} btn={btn} />
+                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} />
             )}
         </div>
     );
 }
 
-function Actions(props) {
-    if(props === "new") {
-        PopupWindow()
-    } else if(props === "play") {
-        null
-    } else if(props === "pause") {
-        null
-    } else if(props === "stop") {
-        null
-    } else if(props === "record") {
-        null
-    } else if(props === "repeat") {
-        null
-    } else if(props === "save") {
-        null
-    } else if(props === "open") {
-        OpenFile()
-    }
-
-}
 
 /* ---------- Open file function ---------- */
 function OpenFile() {
@@ -464,19 +556,27 @@ function PopupWindow() {
     // Get the <span> element that closes the modal
     var span = document.getElementsByClassName("close")[0];
     // When the user clicks the button, open the modal
-    add_btn.onclick = function() {
+    add_btn.onclick = function () {
         modal.style.display = "block";
     }
     // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
+    span.onclick = function () {
         modal.style.display = "none";
     }
     // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         if (event.target == modal) {
             modal.style.display = "none";
         }
     }
+}
+
+function handleClick(){
+    // force a re-render
+    console.log('forcing render')
+    // document.getElementById("comper").innerHTML = '';
+    ReactDOM.unmountComponentAtNode(document.getElementById("comper"))
+    ReactDOM.render(<SongComponent />, root)
 }
 
 function SongComponent(){
@@ -484,7 +584,11 @@ function SongComponent(){
     const [meterType, setMeterType] = useState( () => songInfo.meterType)
     const [meter, setMeter] = useState( () => songInfo.meter)
     const [bpm, setBpm] = useState( () => songInfo.bpm)
-    const [glob_tonality, setGlob_tonality] = useState( () => songInfo.glob_tonality)
+    const [glob_tonality, setGlob_tonaylity] = useState( () => songInfo.glob_tonality)
+    const [modalCaller, setModalCaller] = useState( () => false)
+
+
+
 
     return(
         <div id = "wrapper">
@@ -494,14 +598,14 @@ function SongComponent(){
                 <div id="mtrs-opts">
                     <label>Meter:</label>
                     <select id="meters" name="meters" defaultValue='4/4'>
-                    {meters_options.map(
-                        (mtrs) =>
-                            <optgroup key={mtrs.group} label={mtrs.group}>
-                                { mtrs.values.map((vals) =>
-                                    <option value={vals}>{vals}</option>
-                                )}
-                            </optgroup>
-                    )}
+                        {meters_options.map(
+                            (mtrs) =>
+                                <optgroup key={mtrs.group} label={mtrs.group}>
+                                    { mtrs.values.map((vals) =>
+                                        <option value={vals}>{vals}</option>
+                                    )}
+                                </optgroup>
+                        )}
                     </select>
                 </div>
                 <div>
@@ -521,10 +625,12 @@ function SongComponent(){
                 </div>
             </div>
 
-            <Ctrls />
+            <Ctrls setModalCaller={setModalCaller}/>
 
             <NewSongInfo />
-            
+
+            <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller}/>
+
             <br/>
             <ChordChart key={glob_tonality}/>
             <br/>

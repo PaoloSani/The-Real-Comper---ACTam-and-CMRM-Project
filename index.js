@@ -13,8 +13,12 @@ var firebaseConfig = {
 };
 
 // Initialize Firebase
-// firebase.initializeApp(firebaseConfig);
-// var db = firebase.firestore()
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}else {
+    firebase.app(); // if already initialized, use that one
+}
+var db = firebase.firestore()
 
 function meterToIntArray(string){
     var array = string.split('/');
@@ -79,7 +83,6 @@ class Chord {
 }
 
 
-
 class Song{
     constructor(title, meter, bpm, tonality) {
         this.meter = meterToIntArray(meter || meters_options[0].signatures_set[0]);
@@ -104,60 +107,11 @@ class Song{
         }
     }
 
-    exportSongInfo(songInfo) {
-
-        // updating songInfo properties
-        songInfo.title = this.title
-        songInfo.meterType = this.meterType
-        songInfo.meter = this.meter[0] + '/' + this.meter[1]
-        songInfo.bpm = this.bpm
-        songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + ' ' + this.glob_tonality.name
-    }
-
-    exportSongChart(chartObject){
-        // updating chartObject properties
-        chartObject.chartModel = this.Chart.map( i => i.chord.name )
-        chartObject.chartDegree = this.Chart.map( i => {
-                var deg = i.chord.root.scaleDegree(this.glob_tonality)
-                if (deg == 0) {
-                    var interval = i.chord.root.interval(this.glob_tonality.tonic)
-                    deg = (interval.number()%7).toString() + interval.quality()
-                    if (deg == '1d') deg = '1A' // to fix that dimished octave become an augmented 1
-                }
-                return deg.toString()
-                    .replace('1', 'I')
-                    .replace('2', 'II')
-                    .replace('3', 'III')
-                    .replace('4', 'IV')
-                    .replace('5', 'V')
-                    .replace('6', 'VI')
-                    .replace('7', 'VII')
-                })
-        chartObject.slotModel = this.meterType.slot
-        chartObject.MIDInote = this.Chart.map( i => {
-            return i.chord.notes().map(i => i.midi())
-        })
-
-    }
-
     get Chart(){
         return this._chart;
     }
 
-    get meterType(){
-        return this._meterType;
-    }
-
-    set meterType(value){
-        this._meterType = value;
-    }
-
-    get glob_tonality(){
-        return this._tonality;
-    }
-
     set glob_tonality(value){
-        console.log(value instanceof teoria.Scale);
         if(!(value instanceof teoria.Scale)) this._tonality = teoria.scale(value.split(' ')[0], value.split(' ')[1]);
         if(value instanceof teoria.Scale) this._tonality = value;
     }
@@ -174,6 +128,18 @@ class Song{
         this._title = value;
     }
 
+    get meterType(){
+        return this._meterType;
+    }
+
+    set meterType(value){
+        this._meterType = value;
+    }
+
+    get glob_tonality(){
+        return this._tonality;
+    }
+
     get meter(){
         return this._meter;
     }
@@ -186,87 +152,167 @@ class Song{
         return this._title;
     }
 
+    exportSongInfo(songInfo) {
+
+        // updating songInfo properties
+        songInfo.title = this.title
+        songInfo.meterType = this.meterType
+        songInfo.meter = this.meter[0] + '/' + this.meter[1]
+        songInfo.bpm = this.bpm
+        songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + ' ' + this.glob_tonality.name
+    }
+
+    exportSongChart(chartObject){
+        // updating chartObject properties
+        chartObject.chartModel = this.Chart.map( i => i.chord.name )
+        chartObject.chartDegree = this.Chart.map( i => {
+            var deg = i.chord.root.scaleDegree(this.glob_tonality)
+            if (deg == 0) {
+                var interval = i.chord.root.interval(this.glob_tonality.tonic)
+                deg = (interval.number()%7).toString() + interval.quality()
+                if (deg == '1d') deg = '1A' // to fix that dimished octave become an augmented 1
+            }
+            return deg.toString()
+                .replace('1', 'I')
+                .replace('2', 'II')
+                .replace('3', 'III')
+                .replace('4', 'IV')
+                .replace('5', 'V')
+                .replace('6', 'VI')
+                .replace('7', 'VII')
+        })
+        chartObject.slotModel = this.meterType.slot
+        chartObject.MIDInote = this.Chart.map( i => {
+            return i.chord.notes().map(i => i.midi())
+        })
+
+    }
+
     modifyChord(chord, index){
         this._chart[index].chord = chord;
     }
 
-}
+    // @param a Song instance to be saved to a file
+    saveSongTofile(){
 
+        console.log('saving song ', this.title);
+        // localStorage.setItem(this.title, JSON.stringify(this));
+        var blob = new Blob( [JSON.stringify(this)], {
+            type: 'application/octet-stream'
+        });
+        var url = URL.createObjectURL( blob );
+        var link = document.createElement( 'a' );
+        link.id = 'downloadTag';
+        link.href = url;
+        link.download = this.title + '.json';
+        link.click();
+        window.URL.revokeObjectURL(url);
+    }
 
+    //save current song to firebase
+    async saveToFirebase(collectionName) {
 
-// @param a Song instance to be saved to a file
-function saveSongTofile(songInstance){
+        collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
+        console.log('saving song to firebase "', this.title, '" in ',collectionName);
+        db.collection(collectionName).doc(this.title).set(
+            JSON.parse(JSON.stringify(this))
+        );
 
-    console.log('saving song ', songInstance.title);
-    // localStorage.setItem(songInstance.title, JSON.stringify(songInstance));
-    var blob = new Blob( [JSON.stringify(songInstance)], {
-        type: 'application/octet-stream'
-    });
-    var url = URL.createObjectURL( blob );
-    var link = document.createElement( 'a' );
-    link.id = 'downloadTag';
-    link.href = url;
-    link.download = songInstance.title + '.json';
-    link.click();
-    window.URL.revokeObjectURL(url);
-}
+    }
 
-//@param String containing filename
-//@return a Song obj
-/*async*/ function loadSong(songTitle) {
+    //@param String containing filename
+    //@return a Song obj
+    /*async*/ static loadPreset(songTitle) {
 
-    //note: even if Synchronous XMLHttpRequest is deprecated, it gives me only a warning and not an error
-    console.log('loading song ', songTitle);
-    var parsedSong;
+        //note: even if Synchronous XMLHttpRequest is deprecated, it gives me only a warning and not an error
+        console.log('loading song ', songTitle);
+        var parsedSong;
 
-    // make the http request to get the json file
-    var xhttp = new XMLHttpRequest();
-    xhttp.onreadystatechange = function() {
-        if (this.readyState == 4 && this.status == 200) {
-            parsedSong = JSON.parse(xhttp.responseText);
+        // make the http request to get the json file
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+                parsedSong = JSON.parse(xhttp.responseText);
+                // console.log(xhttp.responseText)
+            }
+        };
+        xhttp.open("GET", "presets/" + songTitle + ".json", false);
+        xhttp.send();
+
+        // const request = async () => {
+        //     const response = await fetch("presets/" + songTitle+ ".json");
+        //     const json = await response.json();
+        //     return json;
+        // }
+        // parsedSong = await request();
+
+        // fetch('./presets/The Girl from Ipanema.json').then(result => result.json()).then(console.log);
+
+        // var parsedSong = JSON.parse(localStorage.getItem(songTitle));
+        // parsedSong = parseFromFirebase(songTitle)
+        // console.log('parsedSong', parsedSong)
+        // return Song.#parseSong(parsedSong)
+        return Song.parseSong(parsedSong)
+    }
+
+    //@param String containing filename
+    static loadFromFirebase(songTitle, collectionName) {
+
+        // put collection to song if not specified
+        collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
+        return db.collection(collectionName).doc(songTitle).get().then(function(doc){
+            console.log('loading from firebase')
+            // console.log(doc.data())
+            return Song.parseSong(doc.data())
+        });
+        // call Song.#parseSong();
+    }
+
+    // todo make parseSong private
+    //@param parsed song Object
+    //@return a song instance
+    static parseSong(parsedSong){
+
+        var instance = new Song("song"); //just to have all methods and submethod
+        Object.assign(instance, parsedSong); //instance is now a Song class obj with methods, but not submethods
+
+        instance.glob_tonality = deserializeScale(parsedSong._tonality)
+
+        instance._chart = instance.Chart.map(parsedChord => deserializeChordClass(parsedChord))
+
+        function deserializeScale(parsedScale) {
+            return teoria.Scale(deserializeNote(parsedScale.tonic), parsedScale.name);
         }
-    };
-    xhttp.open("GET", "presets/" + songTitle+ ".json", false);
-    xhttp.send();
 
+        function deserializeNote(parsedNote) {
+            return teoria.Note(parsedNote.coord, parsedNote.duration);
+        }
 
-    // const request = async () => {
-    //     const response = await fetch("presets/" + songTitle+ ".json");
-    //     const json = await response.json();
-    //     return json;
-    // }
-    // parsedSong = await request();
+        function deserializeChordClass(parsedChord) {
+            return new Chord(parsedChord._chord.name, deserializeScale(parsedChord._tonality));
+        }
 
-    // fetch('./presets/The Girl from Ipanema.json').then(result => result.json()).then(console.log);
-
-    // var parsedSong = JSON.parse(localStorage.getItem(songTitle));
-    // parsedSong = parseFromFirebase(songTitle)
-    // console.log('parsedSong', parsedSong)
-    var instance = new Song(songTitle); //just to have all methods and submethod
-    Object.assign(instance, parsedSong); //instance is now a Song class obj with methods, but not submethods
-
-    instance.glob_tonality = deserializeScale(parsedSong._tonality)
-
-    instance._chart = instance.Chart.map(parsedChord => deserializeChordClass(parsedChord))
-
-    function deserializeScale(parsedScale) {
-        return teoria.Scale(deserializeNote(parsedScale.tonic), parsedScale.name);
+        console.log('loaded song: ', instance)
+        return instance;
     }
 
-    function deserializeNote(parsedNote) {
-        return teoria.Note(parsedNote.coord, parsedNote.duration);
+    //@param collection name: songs or presets
+    static getSongList(collectionName){
+
+        collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
+        return db.collection(collectionName).get()
+            // .then(docList => {
+            //     docList.forEach(
+            //         doc => console.log(doc.id, " => ", doc.data()))
+            //         // doc => doc.id)
+            // })
     }
 
-    function deserializeChordClass(parsedChord) {
-        return new Chord(parsedChord._chord.name, deserializeScale(parsedChord._tonality));
-    }
-
-    console.log('loaded song: ', instance)
-    return instance;
 }
 
 
 //button function handler
+/*
 window.onload = function(){
     document.getElementById("save").addEventListener("click", () => saveSongTofile(newSong));
 
@@ -277,6 +323,7 @@ window.onload = function(){
         loadSong("The Girl from Ipanema")
     });
 };
+*/
 
 
 function getSongList(){
@@ -287,58 +334,40 @@ function getSongList(){
 }
 
 
-async function saveToFirebase(songInstance) {
 
-    console.log('saving song to firebase');
-    db.collection("songs").doc(songInstance.title).update(
-        {
-            songJson: JSON.stringify(songInstance)
-        },
-    );
-
-}
-
-// string of the song
-function parseFromFirebase(songTitle) {
-
-    return db.collection("songs").doc(songTitle).get().then(function(doc){
-        console.log('parsed from firebase', JSON.parse(doc.data().songJson));
-        return JSON.parse(doc.data().songJson)
-    });
-
-}
+// ----------------------------------------------------------------------------
+// example / testing program
 
 
-
-// // ----------------------------------------------------------------------------
-// // example / testing program
-//
-//
-// // create a new song
+// create a new song
 // var newSong = new Song('The Girl from Ipanema', '5/4', 130, 'C major');
 // console.log(newSong);
-//
-// // create obj for react
+
+// create obj for react
 // let songInfo ={};
 // let chart = {};
-//
-// // update those obj
-// newSong.exportSimplifiedSong(songInfo, chart)
-//
-// // print (a copy!) of the obj just populated
+
+// update those obj
+
+
+// print (a copy!) of the obj just populated
 // console.log('songInfo', JSON.parse(JSON.stringify(songInfo)))
 // console.log('chart', JSON.parse(JSON.stringify(chart)))
 //
 // console.log('.....\n\n\n\n....')
-// // load a new song from local
-// newSong = /*await*/ loadSong('The Girl from Ipanema awkward')
-//
-//
-// // setTimeout(newSong.exportSimplifiedSong(songInfo, chart),2000)
-// newSong.exportSimplifiedSong(songInfo, chart)
+// load a new song from host preset folder
+// newSong = /*await*/ Song.loadPreset('The Girl from Ipanema awkward')
+
+
+// setTimeout(newSong.exportSimplifiedSong(songInfo, chart),2000)
+// newSong.exportSongInfo(songInfo)
+// newSong.exportSongChart(chart)
 // console.log('songInfo', songInfo)
 // console.log('chart', chart)
 
 
-module.exports = meters_options
-module.exports = Song
+// module.exports = meters_options
+// module.exports = Song
+//
+export { db, Song }
+
