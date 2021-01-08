@@ -314,7 +314,7 @@ function ChordChart(props){
                     <i className="material-icons" >remove</i>
                 </button>
             </div>
-            <br/>
+            <ChordEditor isOpen={openModal} closeEditor={openEditor} chord={newChord}/>
             <div id="chart">
                 {printChart(chartModel, chartDegree, midiNoteState, slotModel)}
             </div>
@@ -642,7 +642,7 @@ function SongComponent(){
 
             <Ctrls setModalCaller={setModalCaller}/>
 
-            <NewSongInfo />
+            <NewSongInfo setTitle={setTitle}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller}/>
 
