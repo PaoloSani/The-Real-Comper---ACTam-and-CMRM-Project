@@ -10,9 +10,10 @@ import Modal from "react-modal";
 const meters_options = [{
     group: 'Group A',
     values: ['4/4', '17/16', '5/4']
-}, {group: 'Group B',
-        values: ['3/4', '7/8'],
-    }, {
+}, {
+    group: 'Group B',
+    values: ['3/4', '7/8'],
+}, {
     group: 'Group C',
     values: ['5/4']
 }];
@@ -21,6 +22,7 @@ const meters_options = [{
 const key_options = [
     'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'
 ];
+
 // /* ----- Model/View of Control Buttons ----- */
 const bank = [{
     id: 'new',
@@ -72,7 +74,7 @@ const customStyles = {
 };
 
 
-var song = new Song('prova');
+var song = new Song('Prova');
 
 
 song.Chart[0].chord='C6/9'
@@ -80,7 +82,7 @@ song.Chart[1].chord='Am7'
 song.Chart[2].chord='Dm7'
 song.Chart[3].chord='G7'
 
-let songInfo ={};
+let songInfo = {};
 let chart = {};
 var songList = []
 // update those obj
@@ -312,7 +314,7 @@ function ChordChart(props){
                     <i className="material-icons" >remove</i>
                 </button>
             </div>
-            <ChordEditor isOpen={openModal} closeEditor={openEditor} chord={newChord}/>
+            <br/>
             <div id="chart">
                 {printChart(chartModel, chartDegree, midiNoteState, slotModel)}
             </div>
@@ -320,11 +322,38 @@ function ChordChart(props){
     )
 }
 
-function NewSongInfo() {
-    const [sel, setSel] = useState(false)
+function NewSongInfo(props) {
+    const [selKey, setSelKey] = useState(0)
+    const [selMet, setSelMet] = useState(0)
+    const [songName, setSongName] = useState({value: ""})
+    const [songBpm, setSongBpm] = useState(songInfo.bpm)
 
-    const handleClick = () => {
-        setSel(true)
+    const handleKey = (e) => {
+        const ko = key_options.find(k => k == e)
+        setSelKey(ko)
+        songInfo.glob_tonality = ko
+    }
+
+    const handleMeter = (r, e) => {
+        const ts = meters_options[r].values.find(v => v == e)
+        setSelMet(ts)
+        songInfo.meter = ts
+        songInfo.meterType = meters_options[r]
+    }
+    
+    const showSongName = (e) => {
+        setSongName({value: e.target.value})
+        if(e.key === 'Enter'){
+            songInfo.title = songName.value;
+            props.setTitle(songInfo.title)
+            console.log(songName.value)
+        }
+    }
+
+    const showBPM = (e) => {
+        setSongBpm({bpm: e.target.value})
+        songInfo.bpm = songBpm.bpm
+        console.log(songBpm.bpm)
     }
 
     return(
@@ -336,52 +365,38 @@ function NewSongInfo() {
                 </div>
                 <div className="modal-body">
                     <div id="new-title">
-                        <form>
-                            <label>Song Title:
-                                <input type="text" name="song-name" className="new-song-name"/>
-                            </label>
-                        </form>
+                        <label>Song Title:
+                            <input type="text" name="song-name" className="new-song-name" defaultValue={songInfo.title} onKeyPress={showSongName}/>
+                        </label>
                     </div>
-                    <br/>
                     <div id="new-meter" className="new-params">
-                        <p>Meter</p>
+                        <p className="param-title">Meter</p>
                     </div>
-                    <div className="mtr-cntr">
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>4/4</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>17/16</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>5/4</div>
-                    </div>
-                    <div className="mtr-cntr">
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>3/4</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>7/8</div>
-                    </div>
-                    <div className="mtr-cntr">
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>5/4</div>
+                    <div>
+                        {meters_options.map(
+                            (mtrs, ix) =>
+                                <div className="mtr-cntr" key={mtrs.group} id={mtrs.group}>
+                                    { mtrs.values.map((vals) =>
+                                        <div className={selMet == vals ? "meter-btn selected" : "meter-btn"} onClick={() => handleMeter(ix, vals)}>{vals}</div>
+                                    )}
+                                </div>
+                        )}
                     </div>
                     <div id="new-tempo" className="new-params">
-                        <p>Tempo</p>
+                        <p className="param-title">Tempo</p>
                     </div>
                     <div className="sweet-slider">
                         <div className="sweet-slider">
-                            BPM: <input type="number" id="new-bpm" name="new-bpm" min="60" max="220" defaultValue="90"/>
+                            BPM: <input type="number" id="new-bpm" name="new-bpm" min="60" max="220" defaultValue={songInfo.bpm} onChange={showBPM}/>
                         </div>
                     </div>
                     <div id="new-key" className="new-params">
-                        <p>Key</p>
+                        <p className="param-title">Key</p>
                     </div>
-                    <div className="mtr-cntr">
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>C</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>C#/Db</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>D</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>D#/Eb</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>E</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>F</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>F#/Gb</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>G</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>G#/Ab</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>A</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>A#/Bb</div>
-                        <div className={sel ? "meter-btn selected" : "meter-btn"} onClick={handleClick}>B</div>
+                    <div className="key-cntr">
+                        {key_options.map((key) => 
+                            <div className={selKey == key ? "meter-btn selected" : "meter-btn"} onClick={() => handleKey(key)}>{key}</div>
+                        )}
                     </div>
                 </div>
             </div>

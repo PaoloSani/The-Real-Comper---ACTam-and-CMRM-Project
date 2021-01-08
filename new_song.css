@@ -93,6 +93,15 @@ form {
 .new-song-name {
     width: -webkit-fill-available;
     position: inherit;
+    height: 25px;
+    font-size: 20px;
+    margin-top: 1%;
+}
+
+.param-title {
+    font-size: 20px;
+    font-weight: bold;
+    font-family: monospace;
 }
 
 .mtr-cntr {
@@ -100,11 +109,25 @@ form {
     flex-wrap: wrap;
     font-size: 14px;
     justify-content: space-evenly;
-    width: 45vw;
+    width: 30vw;
     border: 1px solid #000;
     color: #000;
     border-radius: 5px;
     padding: 10px;
+    margin: auto;
+    margin-bottom: 5px;
+}
+
+.key-cntr {
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 14px;
+    justify-content: space-evenly;
+    border: 1px solid #000;
+    color: #000;
+    border-radius: 5px;
+    padding: 10px;
+    margin: auto;
     margin-bottom: 5px;
 }
 
@@ -112,8 +135,10 @@ form {
     display: inline-block;
     justify-content: center;
     padding: 5px;
-    background-color: lightgray;
-    border-radius: 5px;
+    background-color: white;
+    border-radius: 16px;
+    font-size: 20px;
+    filter: drop-shadow(0 2px 2px #c7c7c7);
 }
 
 .meter-btn:hover {
@@ -122,7 +147,7 @@ form {
 }
 
 .selected {
-    background-color: #1582e6;
+    background-color: rgb(255 145 0);
     color: #fff;
 }
 
@@ -142,4 +167,8 @@ form {
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+}
+
+#new-bpm {
+    font-size: 20px;
 }

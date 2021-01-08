@@ -1,10 +1,11 @@
 body {
   margin: 0;
-  background:rgb(58, 138, 164);
+  /* background:rgb(58, 138, 164); */
+  background: #fcb85f;
   color: #222;
 }
 
-#music-info, #ctrl-btns div:not(.name) {
+#ctrl-btns div:not(.name) {
   display: inline-block;
 }
 
@@ -14,15 +15,15 @@ h1 {
   width: 100%;
   font-family: 'Parisienne', cursive;
   font-size: 50px;
-  margin-top: 5%;
-  margin-bottom: 0;
+  margin-bottom: 2%;
 }
 
 h2 {
   margin: auto;
   width: 100%;
   font-size: 30px;
-  font-family:'Courier New', Courier, monospace;
+  font-family: 'Avenir', bold;
+  /* font-family:'Courier New', Courier, monospace; */
 }
 
 #bpm {
@@ -44,7 +45,9 @@ h2 {
 label {
   position: relative;
   top: 1%;
-  font-size: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  font-family: monospace;
 }
 
 select {
@@ -62,7 +65,6 @@ select:hover {
 
 #key {
   position: relative;
-  left: 3%;
 }
 
 #keys {
@@ -149,11 +151,10 @@ select:hover {
 
 #chords {
   position: relative;
-  background-color: rgb(58, 138, 164);
   border-radius: 3px;
   width: fit-content;
   height: fit-content;
-  top: 3%;
+  margin-top: 3%;
   left: 50%;
   transform: translateX(-50%);
   text-align: center;
