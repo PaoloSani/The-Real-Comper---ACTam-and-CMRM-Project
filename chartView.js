@@ -2,8 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 const teoria = require("teoria");
 const { useState, useEffect} = React
-// const Song = require('./index.js')
-import { db, Song } from "./index";
+import { Song } from "./index";
 import Modal from "react-modal";
 
 
@@ -86,7 +85,6 @@ var songList = []
 // update those obj
 song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
-
 
 function ChordEditor(props){
     const [isOpen, setIsOpen] = useState(false)
@@ -219,11 +217,30 @@ function ChordChart(props){
     const [newChord, setNewChord] = useState( () => "")
     const [indexOfChord, setIndex] = useState( () => 0)
 
+    useEffect(
+        () => {
+            if(props.newSongLoading){
+                updateStates()
+                props.setNewSongLoading(false)
+            }
+        },[props.newSongLoading]
+    )
+
+    useEffect(
+        () => {
+            console.log(chartModel)
+            console.log(chartDegree)
+            console.log(slotModel)
+            console.log(midiNoteState)
+            }, []
+    )
+
     const updateStates = () => {
         setChartModel([...chart.chartModel])
         setChartDegree([...chart.chartDegree])
         setSlotModel(chart.slotModel)
         setMidiNoteState([...chart.MIDInote])
+
     }
 
     const addBar = () => {
@@ -399,6 +416,16 @@ function LoadSongModal(props){
         props.setModalCaller(false)
     }
 
+    function loadSong(index) {
+        song = Song.parseSong(songList[index])
+        song.exportSongInfo(songInfo)
+        chart = {}
+        song.exportSongChart(chart)
+        console.log('i want to call the update function', songInfo,chart)
+        props.setNewSongLoading(true)
+        closeModal()
+    }
+
     useEffect(
         () => {
             if (props.isOpen){
@@ -411,27 +438,16 @@ function LoadSongModal(props){
                         // console.log(promiseArray)
                         promiseArray.forEach((docList, docListIndex) => {
                             songList.push(docListIndex)
-                            docList.forEach(song => songList.push(song.data()._title))
+                            docList.forEach(song => songList.push(song.data()/*._title*/))
                         });
                     }
                 )
-                    // .then(() => console.log('finito di caricare', songList))
-                    .then(() => setModalSongList([...songList]))
+                // .then(() => console.log('finito di caricare', songList))
+                // .then(() => setModalSongList([...songList]))
+                .then(() => setModalSongList(songList.map(i => (i instanceof Object) ? i._title : i)) )
             }
         }, [props.isOpen]
     )
-
-    // loadAllSongs()
-
-
-        // .then(setModalSongList(songList))
-        // .then(() => setVariable(songList))
-    // .then(setVariable( songList.map(song => console.log(song._title))));
-
-    function setVariable(list) {
-        console.log(list)
-        setTimeout(() => setModalSongList(list), 10000)
-    }
 
 
     return (
@@ -449,7 +465,7 @@ function LoadSongModal(props){
                                         (songTitle === 0 | songTitle === 1) ?
                                             undefined
                                         :(
-                                            () => alert('selected song ' + index)
+                                            () => loadSong(index)
                                         )
                                     }
                                     className={
@@ -483,21 +499,15 @@ function Buttons(props) {
         } else if(id === "pause") {
             null
         } else if(id === "stop") {
+            // todo remove
             handleClick()
         } else if(id === "record") {
             null
         } else if(id === "repeat") {
             null
         } else if(id === "save") {
-            Song.loadFromFirebase('The Girl from Ipanema').then(songObj => song = songObj).then(() => {
-                console.log('loaded song from firebase')
-                song.exportSongInfo(songInfo)
-                song.exportSongChart(chart)
-                console.log(songInfo)
-                console.log(chart)
-            })
+            song.saveToFirebase()
         } else if(id === "open") {
-            // PopupWindow2()
             props.openModal(true)
             // OpenFile()
         }
@@ -586,8 +596,32 @@ function SongComponent(){
     const [bpm, setBpm] = useState( () => songInfo.bpm)
     const [glob_tonality, setGlob_tonaylity] = useState( () => songInfo.glob_tonality)
     const [modalCaller, setModalCaller] = useState( () => false)
+    const [newSongLoading, setNewSongLoading] = useState( () => false)
 
+    useEffect(
+        () =>{
+            if(newSongLoading){
+                setTitle(songInfo.title)
+                setMeter(songInfo.meter)
+                setMeterType(songInfo.meterType)
+                setBpm(songInfo.bpm)
+                setGlob_tonaylity(songInfo.glob_tonality)
+            }
+        }, [newSongLoading]
+    )
 
+    useEffect(
+        () =>{
+            if(newSongLoading){
+                console.log(newSongLoading)
+                console.log(songInfo.title)
+                console.log(songInfo.meter)
+                console.log(songInfo.meterType)
+                console.log(songInfo.bpm)
+                console.log(songInfo.glob_tonality)
+            }
+        }
+    )
 
 
     return(
@@ -597,7 +631,7 @@ function SongComponent(){
                 <h2>{title}</h2>
                 <div id="mtrs-opts">
                     <label>Meter:</label>
-                    <select id="meters" name="meters" defaultValue='4/4'>
+                    <select id="meters" name="meters" defaultValue='4/4' value={meter} style={{width: 'fit-content'}}>
                         {meters_options.map(
                             (mtrs) =>
                                 <optgroup key={mtrs.group} label={mtrs.group}>
@@ -611,12 +645,12 @@ function SongComponent(){
                 <div>
                     <label>Tempo:</label>
                     <span id="music-note">
-                       ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" defaultValue="90" title="Enter the tempo desired."/>
+                       ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" defaultValue="90" value={bpm} title="Enter the tempo desired."/>
                    </span>
                 </div>
                 <div id="key-opts">
                     <label id="key">Key:</label>
-                    <select id="keys" name="key" defaultValue='C'>
+                    <select id="keys" name="key" defaultValue='C' value={glob_tonality.charAt(0)}>
                         {key_options.map(
                             (key) =>
                                 <option value={key}>{key}</option>
@@ -629,10 +663,10 @@ function SongComponent(){
 
             <NewSongInfo />
 
-            <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller}/>
+            <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
 
             <br/>
-            <ChordChart key={glob_tonality}/>
+            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading}/>
             <br/>
 
             <div id="piano-roll">
