@@ -5,6 +5,7 @@ const { useState, useEffect} = React
 // const Song = require('./index.js')
 import { db, Song } from "./index";
 import Modal from "react-modal";
+import {midiRecorder} from "./midiRecorder";
 
 
 const meters_options = [{
@@ -56,7 +57,7 @@ const bank = [{
     name: 'Open'
 }];
 
-const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', 'custom']
+const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', '%', 'custom']
 
 
 const customStyles = {
@@ -88,6 +89,13 @@ song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
 
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// MIDI RECORDING ///////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+midiRecorder.init()
+
+
 function ChordEditor(props){
     const [isOpen, setIsOpen] = useState(false)
     const [selRoot, setSelRoot] = useState(() => props.chord.name)
@@ -105,23 +113,34 @@ function ChordEditor(props){
             chord = customSel
         }
         else {
-            chord = selRoot+selType
+            if ( selType === '%'){
+                chord = selType
+            }
+            else{
+                chord = selRoot+selType
+            }
         }
 
         props.closeEditor(false, 0, chord.slice())
     }
 
     const initializeModal = () => {
+        console.log('Reached modal')
         let chord = props.chord;
         let type = chord.slice(1)
         chord = chord[0];
         setSelRoot(chord)
-        if ( chord_type.includes(type)){
+        if ( chord_type.includes(type) ){
             setSelType(type)
         }
         else {
-            setSelType('custom')
-            setCustomSel(chord+type)
+            if ( chord === '%' ){
+                setSelType('%')
+            }
+            else {
+                setSelType('custom')
+                setCustomSel(chord+type)
+            }
         }
     }
 
@@ -205,7 +224,9 @@ function ChordBlock(props){
         <div className={ (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block"} >
             <i className="fas fa-edit edit" onClick={editChord}></i>
             <div className={"chord"}>{props.name}</div>
-            <div className={"degree"}>{props.degree}</div>
+            {props.name !== '%' && (
+                <div className={"degree"}>{props.degree}</div>
+            )}
         </div>
     )
 }
@@ -271,7 +292,7 @@ function ChordChart(props){
 
     useEffect(
         () =>{
-            if ( newChord !== ""){
+            if ( newChord !== "" && newChord !== '%'){
                 song.modifyChord(newChord, indexOfChord)
                 song.exportSongChart(chart)
                 updateStates()
@@ -296,7 +317,16 @@ function ChordChart(props){
             setNewChord(chord)
         }
         else {
-            setNewChord(chord)
+            if ( chord === '%' ){
+                // find the last valid chord
+                let i
+                for ( i = 1; chartModel[indexOfChord-i] === '%'; i++){}
+
+                setNewChord(chartModel[indexOfChord-i])
+            }
+            else {
+                setNewChord(chord)
+            }
         }
 
         setOpenModal(state)
@@ -474,6 +504,23 @@ function LoadSongModal(props){
 
 /* ---------- Functions to add Control Buttons ---------- */
 function Buttons(props) {
+    const [isRecording, setRecording] = useState( () => false );
+
+
+    const startRecording = () => {
+        setRecording(true);
+        midiRecorder.setRecording(true);
+    }
+
+    const stopRecording = () => {
+        var player = document.getElementById('midi-player1');
+        setRecording(false);
+        midiRecorder.setRecording(false);
+        console.log(midiRecorder.getNoteSequence())
+        player.noteSequence = midiRecorder.getNoteSequence();
+    }
+
+
 
     function Actions(id) {
         if(id === "new") {
@@ -485,7 +532,10 @@ function Buttons(props) {
         } else if(id === "stop") {
             handleClick()
         } else if(id === "record") {
-            null
+            if(!isRecording){
+                startRecording()
+            }
+            else stopRecording();
         } else if(id === "repeat") {
             null
         } else if(id === "save") {
@@ -635,30 +685,8 @@ function SongComponent(){
             <ChordChart key={glob_tonality}/>
             <br/>
 
-            <div id="piano-roll">
-                <midi-visualizer
-                    type="waterfall"
-                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
-                </midi-visualizer>
-                <midi-visualizer
-                    type="staff"
-                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
-                </midi-visualizer>
 
-                <midi-player
-                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid"
-                    sound-font visualizer="#piano-roll midi-visualizer" id="midi-player1">
-                </midi-player>
 
-                <svg>
-                    <defs>
-                        <linearGradient id="keyGradient" x1="15%" x2="0%" y1="0" y2="100%">
-                            <stop stopColor="black" offset="60%"/>
-                            <stop stopColor="grey" offset="99%"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
         </div>
     )
 }

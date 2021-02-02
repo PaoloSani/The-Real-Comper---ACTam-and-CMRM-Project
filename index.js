@@ -164,7 +164,14 @@ class Song{
 
     exportSongChart(chartObject){
         // updating chartObject properties
-        chartObject.chartModel = this.Chart.map( i => i.chord.name )
+        chartObject.chartModel = this.Chart.map( (i, index) => {
+            if ( index > 0 && i.chord.name === this.Chart[index - 1].chord.name ){
+                return '%'
+            }
+            else {
+               return i.chord.name
+            }
+        } )
         chartObject.chartDegree = this.Chart.map( i => {
             var deg = i.chord.root.scaleDegree(this.glob_tonality)
             if (deg == 0) {
@@ -185,7 +192,6 @@ class Song{
         chartObject.MIDInote = this.Chart.map( i => {
             return i.chord.notes().map(i => i.midi())
         })
-
     }
 
     modifyChord(chord, index){
