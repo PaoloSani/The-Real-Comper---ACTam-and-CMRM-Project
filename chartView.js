@@ -509,15 +509,15 @@ function Buttons(props) {
 
     const startRecording = () => {
         setRecording(true);
-        midiRecorder.setRecording(true);
+        midiRecorder_1.setRecording(true);
     }
 
     const stopRecording = () => {
         var player = document.getElementById('midi-player1');
         setRecording(false);
-        midiRecorder.setRecording(false);
-        console.log(midiRecorder.getNoteSequence())
-        player.noteSequence = midiRecorder.getNoteSequence();
+        midiRecorder_1.setRecording(false);
+        console.log(midiRecorder_1.getNoteSequence())
+        player.noteSequence = midiRecorder_1.getNoteSequence();
     }
 
 
