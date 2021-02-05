@@ -6,13 +6,32 @@ var midiRecorder = {
     },
     initialTimeStamp: null,
     timeStampArray: new Array(127).fill(0),
+    soundFontPlayer: new core.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'),
 
     init: function() {
 
+        this.soundFontPlayer.loadAllSamples();
+
         const onMIDIMessage = (message) => {
+
+            var command = message.data[0];
+            var pitch = message.data[1];
+
+            var svg = document.getElementsByClassName('waterfall-piano')[0]
+            const rect = svg.querySelector(`rect[data-pitch="${pitch}"]`)
+
+            if(command == 144){
+                this.soundFontPlayer.playNoteDown({ pitch: pitch });
+                rect.classList.add('active')
+                rect.setAttribute('fill', `orange`);
+            }
+            if(command == 128){
+                this.soundFontPlayer.playNoteUp({ pitch: message.data[1] });
+                rect.classList.remove('active')
+                rect.setAttribute('fill', rect.getAttribute('original-fill'));
+            }
+            
             if( this.isRecording ){
-                var command = message.data[0];
-                var pitch = message.data[1];
                 var timeStamp = ((message.timeStamp - this.initialTimeStamp) / 1000).toFixed(4);
 
                 if (command === 144 ){ //noteOn

@@ -1,11 +1,22 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 const teoria = require("teoria");
-const { useState, useEffect} = React
+const { useState, useEffect } = React
 // const Song = require('./index.js')
-import { db, Song } from "./index";
+import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
+
+//todo
+// riproduzione/visualizzazione singolo accordo su tastiera
+// chordToNoteSequence(midiChord, start, end)
+// da chiamare questa funzione dalla chart, per ogni accordo... tipo con doppioClick (?)
+// chordToNoteSequence(chart[indexDellAccordo], 0, 5) //5 secondi
+// player.start()
+//
+// nota:
+// var player = document.getElementById('midi-player1');
+// questa riga l'ho spostata fuori da react cosí tutti i componenti la vedono
 
 
 const meters_options = [{
@@ -73,7 +84,7 @@ const customStyles = {
 };
 
 
-var song = new Song('prova');
+var song = new Song('Prova');
 
 
 song.Chart[0].chord='C6/9'
@@ -87,7 +98,7 @@ var songList = []
 // update those obj
 song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
-
+var player = document.getElementById('midi-player1');
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////// MIDI RECORDING ///////////////////////////////////////////
@@ -251,6 +262,7 @@ function ChordChart(props){
         song.addBar()
         song.exportSongChart(chart)
         updateStates()
+        console.log(chart)
     }
 
     const removeBar =  () => {
@@ -509,15 +521,14 @@ function Buttons(props) {
 
     const startRecording = () => {
         setRecording(true);
-        midiRecorder_1.setRecording(true);
+        midiRecorder.setRecording(true);
     }
 
     const stopRecording = () => {
-        var player = document.getElementById('midi-player1');
         setRecording(false);
-        midiRecorder_1.setRecording(false);
-        console.log(midiRecorder_1.getNoteSequence())
-        player.noteSequence = midiRecorder_1.getNoteSequence();
+        midiRecorder.setRecording(false);
+        console.log(midiRecorder.getNoteSequence())
+        player.noteSequence = midiRecorder.getNoteSequence();
     }
 
 
@@ -526,7 +537,7 @@ function Buttons(props) {
         if(id === "new") {
             PopupWindow()
         } else if(id === "play") {
-            null
+            chartToNoteSequence(songInfo, chart)
         } else if(id === "pause") {
             null
         } else if(id === "stop") {

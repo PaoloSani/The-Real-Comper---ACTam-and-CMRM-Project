@@ -375,5 +375,41 @@ function getSongList(){
 // module.exports = meters_options
 // module.exports = Song
 //
-export { db, Song }
+
+
+function chordToNoteSequence(midiChord, start, end){
+
+    var chordNoteSequence = {
+        notes: [],
+        totalTime: end,
+    }
+    midiChord.forEach(i => chordNoteSequence.notes.push(
+        {
+            pitch: i, startTime: start, endTime: end
+        }
+    ))
+    return chordNoteSequence
+}
+
+function chartToNoteSequence(songInfo, chart){
+
+    var chartNoteSequence = {
+        notes: [],
+        totalTime: 0
+    }
+
+    var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
+    chart.MIDInote.forEach((i,index) => {
+            chordToNoteSequence(i,index*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+                chartNoteSequence.notes.push(i)
+            })
+            chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+        }
+    )
+    var player = document.getElementById('midi-player1')
+    player.noteSequence = chartNoteSequence;
+    console.log(chartNoteSequence)
+}
+
+export { db, Song, chordToNoteSequence, chartToNoteSequence }
 
