@@ -230,9 +230,21 @@ function ChordBlock(props){
         props.openEditor(true, props.index);
     }
 
+    const className = (index, slot, isPlaying) => {
+        var name = (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block";
+
+        if (index === isPlaying){
+            name = name.concat(" selected")
+        }
+        return name;
+    }
+
+    const show = () => {
+        props.showChord(props.index)
+    }
 
     return (
-        <div className={ (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block"} >
+        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} >
             <i className="fas fa-edit edit" onClick={editChord}></i>
             <div className={"chord"}>{props.name}</div>
             {props.name !== '%' && (
@@ -249,13 +261,15 @@ function ChordChart(props){
     const [midiNoteState, setMidiNoteState] = useState( () => chart.MIDInote)
     const [openModal, setOpenModal] = useState( () => false)
     const [newChord, setNewChord] = useState( () => "")
-    const [indexOfChord, setIndex] = useState( () => 0)
+    const [indexOfChordToModify, setIndexToModify] = useState( () => 0)
+    const [indexOfChordToPlay, setIndexToPlay] = useState( () => chart.chartModel.length + 1)
 
     const updateStates = () => {
         setChartModel([...chart.chartModel])
         setChartDegree([...chart.chartDegree])
         setSlotModel(chart.slotModel)
         setMidiNoteState([...chart.MIDInote])
+        setIndexToPlay(chart.chartModel.length+1)
     }
 
     const addBar = () => {
@@ -273,7 +287,7 @@ function ChordChart(props){
 
     const printChord = (name, index, degree, midi) => {
         return (
-        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor}/>
+        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor} isPlaying={indexOfChordToPlay} showChord={setIndexToPlay}/>
         )
     }
 
@@ -302,10 +316,26 @@ function ChordChart(props){
         return arr.map( (i, index)=> printLine(index, namesPerLine[index], degreesPerLine[index], midiPerLine[index]))
     }
 
+    const startPlaying = () => {
+        let i = 0;
+        var t;
+
+        var interval = setInterval(() => {
+            if ( i === chartModel.length ){
+                clearInterval(interval);
+            }
+            console.log(i);
+            setIndexToPlay(i);
+            i++;
+        }, (1 / ( songInfo.bpm / 60 ))*1000);
+
+
+    }
+
     useEffect(
         () =>{
             if ( newChord !== "" && newChord !== '%'){
-                song.modifyChord(newChord, indexOfChord)
+                song.modifyChord(newChord, indexOfChordToModify)
                 song.exportSongChart(chart)
                 updateStates()
             }
@@ -321,20 +351,32 @@ function ChordChart(props){
         }, [props.updateNewSong]
     )
 
+    useEffect(
+        () =>{
+            if ( props.isPlaying ){
+                startPlaying()
+                props.stopPlaying(false)
+            }
+            else {
+                setIndexToPlay(chartModel.length+1);
+            }
+        }, [props.isPlaying]
+    )
+
 
     const openEditor = (state, index, chord) => {
         if ( state ){
             let chord = chartModel[index]
-            setIndex(index)
+            setIndexToModify(index)
             setNewChord(chord)
         }
         else {
             if ( chord === '%' ){
                 // find the last valid chord
                 let i
-                for ( i = 1; chartModel[indexOfChord-i] === '%'; i++){}
+                for ( i = 1; chartModel[indexOfChordToModify-i] === '%'; i++){}
 
-                setNewChord(chartModel[indexOfChord-i])
+                setNewChord(chartModel[indexOfChordToModify-i])
             }
             else {
                 setNewChord(chord)
@@ -538,9 +580,11 @@ function Buttons(props) {
             PopupWindow()
         } else if(id === "play") {
             chartToNoteSequence(songInfo, chart)
+            props.startPlaying(true)
         } else if(id === "pause") {
             null
         } else if(id === "stop") {
+            props.startPlaying(false);
             handleClick()
         } else if(id === "record") {
             if(!isRecording){
@@ -569,7 +613,7 @@ function Buttons(props) {
             { props.btn.id === "open" ?
                 <input type="file" id="a-file" accept=".mid" hidden="hidden" /> : null
             }
-            <div key={props.btn.id} id={props.btn.id} className="button" onClick={() => Actions(props.btn.id)} >
+            <div key={props.btn.id} id={props.btn.id} className="button" onClick={() => Actions(props.btn.id)}>
                 { props.btn.id === "open" ?
                     <i className="material-icons" id="folder-btn">{props.btn.icon}</i> :
                     <i className="material-icons">{props.btn.icon}</i>
@@ -587,7 +631,7 @@ function Ctrls(props) {
         <div id="control-buttons">
             {bank.map(
                 (btn) =>
-                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} />
+                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} startPlaying={props.startPlaying} />
             )}
         </div>
     );
@@ -647,9 +691,7 @@ function SongComponent(){
     const [bpm, setBpm] = useState( () => songInfo.bpm)
     const [glob_tonality, setGlob_tonaylity] = useState( () => songInfo.glob_tonality)
     const [modalCaller, setModalCaller] = useState( () => false)
-
-
-
+    const [isPlaying, setIsPlaying] = useState( () => false)
 
     return(
         <div id = "wrapper">
@@ -686,14 +728,14 @@ function SongComponent(){
                 </div>
             </div>
 
-            <Ctrls setModalCaller={setModalCaller}/>
+            <Ctrls setModalCaller={setModalCaller} startPlaying={setIsPlaying}/>
 
             <NewSongInfo />
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller}/>
 
             <br/>
-            <ChordChart key={glob_tonality}/>
+            <ChordChart key={glob_tonality} isPlaying={isPlaying} stopPlaying={setIsPlaying}/>
             <br/>
 
 

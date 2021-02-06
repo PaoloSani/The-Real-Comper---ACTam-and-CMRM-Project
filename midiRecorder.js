@@ -32,7 +32,7 @@ var midiRecorder = {
             }
             
             if( this.isRecording ){
-                var timeStamp = ((message.timeStamp - this.initialTimeStamp) / 1000).toFixed(4);
+                var timeStamp = ((message.timeStamp - this.initialTimeStamp) / 1000).toFixed(5);
 
                 if (command === 144 ){ //noteOn
                     this.timeStampArray[pitch] = timeStamp;
