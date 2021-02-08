@@ -31,7 +31,7 @@ const meters_options = [{
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
-    'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'
+    'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#','Bb', 'B'
 ];
 // /* ----- Model/View of Control Buttons ----- */
 const bank = [{
