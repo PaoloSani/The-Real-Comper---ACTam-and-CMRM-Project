@@ -58,8 +58,8 @@
     text-align: center;
 }
 
-.chord-block .selected {
-    background: #ba6113;
+.chord-selected {
+    background: #91b942;
 }
 
 .chord-block.right {

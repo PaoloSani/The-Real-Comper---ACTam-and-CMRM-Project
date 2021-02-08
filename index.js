@@ -377,6 +377,7 @@ function getSongList(){
 //
 
 
+
 function chordToNoteSequence(midiChord, start, end){
 
     var chordNoteSequence = {
@@ -399,17 +400,39 @@ function chartToNoteSequence(songInfo, chart){
     }
 
     var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
-    chart.MIDInote.forEach((i,index) => {
-            chordToNoteSequence(i,index*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+
+    var repeat = 0;
+
+    for (let i = 0; i < chart.MIDInote.length; i++ ){
+        var curr = chart.MIDInote[i];
+        var next = chart.MIDInote[i+1];
+
+        if ( JSON.stringify(curr)!== JSON.stringify(next)){
+            let index = i;
+            chordToNoteSequence(curr,(index-repeat)*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
                 chartNoteSequence.notes.push(i)
             })
             chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+            repeat = 0;
         }
-    )
+        else {
+            repeat++;
+        }
+    }
+
+    // console.log(chart.MIDInote[0]);
+    // chart.MIDInote.forEach((i,index) => {
+    //         chordToNoteSequence(i,index*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+    //             chartNoteSequence.notes.push(i)
+    //         })
+    //         chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+    //     }
+    // )
+
     var player = document.getElementById('midi-player1')
+
     player.noteSequence = chartNoteSequence;
     console.log(chartNoteSequence)
 }
 
 export { db, Song, chordToNoteSequence, chartToNoteSequence }
-

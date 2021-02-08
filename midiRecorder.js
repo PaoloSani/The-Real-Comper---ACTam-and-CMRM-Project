@@ -7,6 +7,7 @@ var midiRecorder = {
     initialTimeStamp: null,
     timeStampArray: new Array(127).fill(0),
     soundFontPlayer: new core.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'),
+    velocity: new Array(127).fill(0),
 
     init: function() {
 
@@ -17,15 +18,18 @@ var midiRecorder = {
             var command = message.data[0];
             var pitch = message.data[1];
 
+
             var svg = document.getElementsByClassName('waterfall-piano')[0]
             const rect = svg.querySelector(`rect[data-pitch="${pitch}"]`)
 
-            if(command == 144){
-                this.soundFontPlayer.playNoteDown({ pitch: pitch });
+            if(command === 144){
+                this.velocity[pitch] = message.data[2];
+                this.soundFontPlayer.playNoteDown({ pitch: pitch, velocity: this.velocity[pitch] });
                 rect.classList.add('active')
-                rect.setAttribute('fill', `orange`);
+
+                rect.setAttribute('fill', `rgb(255, 165, 0, ${this.velocity[pitch]/127 + 0.5})`);
             }
-            if(command == 128){
+            if(command === 128){
                 this.soundFontPlayer.playNoteUp({ pitch: message.data[1] });
                 rect.classList.remove('active')
                 rect.setAttribute('fill', rect.getAttribute('original-fill'));
@@ -40,13 +44,11 @@ var midiRecorder = {
 
                 if ( command === 128 ){ //noteOff
                     this.noteSequence.notes.push(
-                        {pitch: pitch, startTime: this.timeStampArray[pitch], endTime: timeStamp},)
+                        {pitch: pitch, startTime: this.timeStampArray[pitch], endTime: timeStamp, velocity: this.velocity[pitch]},)
                 }
 
                 this.noteSequence.totalTime = timeStamp;
             }
-
-            // TODO: fai sentire la nota
         }
 
         function onMIDISuccess(midiAccess) {

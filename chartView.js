@@ -234,7 +234,7 @@ function ChordBlock(props){
         var name = (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block";
 
         if (index === isPlaying){
-            name = name.concat(" selected")
+            name = name.concat(" chord-selected")
         }
         return name;
     }
@@ -324,7 +324,6 @@ function ChordChart(props){
             if ( i === chartModel.length ){
                 clearInterval(interval);
             }
-            console.log(i);
             setIndexToPlay(i);
             i++;
         }, (1 / ( songInfo.bpm / 60 ))*1000);
@@ -562,11 +561,13 @@ function Buttons(props) {
 
 
     const startRecording = () => {
+        var recordBtn = document.getElementById("record").style.color = "red";
         setRecording(true);
         midiRecorder.setRecording(true);
     }
 
     const stopRecording = () => {
+        var recordBtn = document.getElementById("record").style.color = "inherit";
         setRecording(false);
         midiRecorder.setRecording(false);
         console.log(midiRecorder.getNoteSequence())
@@ -689,7 +690,7 @@ function SongComponent(){
     const [meterType, setMeterType] = useState( () => songInfo.meterType)
     const [meter, setMeter] = useState( () => songInfo.meter)
     const [bpm, setBpm] = useState( () => songInfo.bpm)
-    const [glob_tonality, setGlob_tonaylity] = useState( () => songInfo.glob_tonality)
+    const [glob_tonality, setGlob_tonality] = useState( () => songInfo.glob_tonality)
     const [modalCaller, setModalCaller] = useState( () => false)
     const [isPlaying, setIsPlaying] = useState( () => false)
 

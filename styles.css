@@ -162,7 +162,8 @@ select:hover {
 #piano-roll {
   position: relative;
   top: 7%;
-  text-align: center;
+  margin: auto;
+  width: fit-content;
 }
 
 .waterfall-visualizer {
