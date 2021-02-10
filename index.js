@@ -84,9 +84,9 @@ class Chord {
 
 
 class Song{
-    constructor(title, meter, bpm, tonality) {
+    constructor(title, meter, bpm, tonality, meterIndex) {
         this.meter = meterToIntArray(meter || meters_options[0].signatures_set[0]);
-        this.meterType = meters_options[0];
+        this.meterType = meters_options[meterIndex] || meters_options[0];
         this.bpm = bpm || 120;
         this.glob_tonality = tonality || 'C major';
         this._chart = [];
@@ -138,6 +138,15 @@ class Song{
 
     get glob_tonality(){
         return this._tonality;
+    }
+
+    transposeSong(newTonality){
+        var interval = teoria.interval(this.glob_tonality, newTonality);
+        
+        for ( let i = 0; i < this.Chart.length; i++){
+            this.Chart[i] = this.Chart[i].chord().chord.transpose(interval);
+        }
+        console.log(interval)
     }
 
     get meter(){

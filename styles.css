@@ -1,7 +1,8 @@
 body {
   margin: 0;
   /* background:rgb(58, 138, 164); */
-  background: #fcb85f;
+  /* background: #fcb85f; */
+  background: antiquewhite;
   color: #222;
 }
 
@@ -13,17 +14,21 @@ h1 {
   padding-top: 0;
   text-align: center;
   width: 100%;
-  font-family: 'Parisienne', cursive;
+  font-family: 'Baby Kruffy', arial;
   font-size: 50px;
   margin-bottom: 2%;
+  text-transform: capitalize;
 }
 
 h2 {
-  margin: auto;
-  width: 100%;
+  margin-bottom: auto;
+  width: max-content;
   font-size: 30px;
-  font-family: 'Avenir', bold;
-  /* font-family:'Courier New', Courier, monospace; */
+  text-transform: uppercase;
+  text-decoration: underline;
+  font-family: 'Indie Flower', cursive;
+  
+
 }
 
 #bpm {
@@ -51,7 +56,7 @@ label {
 }
 
 select {
-  width: 50px;
+  width: max-content;
   height: 30px;
   top: 25%;
   left: 10%;
@@ -124,11 +129,16 @@ select:hover {
   margin: auto;
   vertical-align: middle;
   padding: 5px;
-  border: 1px solid #FFF;
+  border: 1px solid #000;
   color: #000;
   border-radius: 5px;
   display: -webkit-box;
-  /* margin-top: 8vh; */
+  margin-top: 3vh;
+  background-color: #dea04f;
+}
+
+.record {
+  color: #bb1c1c;
 }
 
 .button {
