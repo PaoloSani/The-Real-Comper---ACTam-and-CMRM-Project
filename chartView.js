@@ -7,16 +7,6 @@ import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
 
-//todo
-// riproduzione/visualizzazione singolo accordo su tastiera
-// chordToNoteSequence(midiChord, start, end)
-// da chiamare questa funzione dalla chart, per ogni accordo... tipo con doppioClick (?)
-// chordToNoteSequence(chart[indexDellAccordo], 0, 5) //5 secondi
-// player.start()
-//
-// nota:
-// var player = document.getElementById('midi-player1');
-// questa riga l'ho spostata fuori da react cosí tutti i componenti la vedono
 
 
 const meters_options = [{
@@ -243,8 +233,17 @@ function ChordBlock(props){
         props.showChord(props.index)
     }
 
+    const playChord = () => {
+        player.noteSequence = chordToNoteSequence(chart.MIDInote[props.index], 0, 3)
+        player.stop()
+        // Tone.Transport.clear()
+        Tone.Transport.stop()
+        player.start()
+        console.log(player.noteSequence)
+    }
+
     return (
-        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} >
+        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} onDoubleClick={playChord} >
             <i className="fas fa-edit edit" onClick={editChord}></i>
             <div className={"chord"}>{props.name}</div>
             {props.name !== '%' && (
