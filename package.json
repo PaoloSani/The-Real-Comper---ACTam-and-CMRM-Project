@@ -1,11 +1,13 @@
 {
   "dependencies": {
     "core-decorators": "^0.20.0",
+    "html-midi-player": "^1.1.0",
     "index.js": "0.0.3",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "react-onclickoutside": "^6.9.0",
-    "regenerator-runtime": "^0.13.7"
+    "regenerator-runtime": "^0.13.7",
+    "simple-midi-input": "^1.2.0"
   },
   "devDependencies": {
     "react-modal": "^3.12.1",

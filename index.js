@@ -142,7 +142,7 @@ class Song{
 
     transposeSong(newTonality){
         var interval = teoria.interval(this.glob_tonality, newTonality);
-        
+
         for ( let i = 0; i < this.Chart.length; i++){
             this.Chart[i] = this.Chart[i].chord().chord.transpose(interval);
         }
@@ -173,7 +173,14 @@ class Song{
 
     exportSongChart(chartObject){
         // updating chartObject properties
-        chartObject.chartModel = this.Chart.map( i => i.chord.name )
+        chartObject.chartModel = this.Chart.map( (i, index) => {
+            if ( index > 0 && i.chord.name === this.Chart[index - 1].chord.name ){
+                return '%'
+            }
+            else {
+               return i.chord.name
+            }
+        } )
         chartObject.chartDegree = this.Chart.map( i => {
             var deg = i.chord.root.scaleDegree(this.glob_tonality)
             if (deg == 0) {
@@ -374,5 +381,67 @@ function getSongList(){
 // console.log('chart', chart)
 
 
-export { Song }
+// module.exports = meters_options
+// module.exports = Song
+//
 
+
+
+function chordToNoteSequence(midiChord, start, end){
+
+    var chordNoteSequence = {
+        notes: [],
+        totalTime: end,
+    }
+    midiChord.forEach(i => chordNoteSequence.notes.push(
+        {
+            pitch: i, startTime: start, endTime: end
+        }
+    ))
+    return chordNoteSequence
+}
+
+function chartToNoteSequence(songInfo, chart){
+
+    var chartNoteSequence = {
+        notes: [],
+        totalTime: 0
+    }
+
+    var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
+
+    var repeat = 0;
+
+    for (let i = 0; i < chart.MIDInote.length; i++ ){
+        var curr = chart.MIDInote[i];
+        var next = chart.MIDInote[i+1];
+
+        if ( JSON.stringify(curr)!== JSON.stringify(next)){
+            let index = i;
+            chordToNoteSequence(curr,(index-repeat)*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+                chartNoteSequence.notes.push(i)
+            })
+            chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+            repeat = 0;
+        }
+        else {
+            repeat++;
+        }
+    }
+
+    // console.log(chart.MIDInote[0]);
+    // chart.MIDInote.forEach((i,index) => {
+    //         chordToNoteSequence(i,index*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+    //             chartNoteSequence.notes.push(i)
+    //         })
+    //         chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+    //     }
+    // )
+
+    var player = document.getElementById('midi-player1')
+
+    player.noteSequence = chartNoteSequence;
+    console.log(chartNoteSequence)
+}
+
+export { db, Song, chordToNoteSequence, chartToNoteSequence }

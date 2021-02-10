@@ -1,10 +1,12 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 const teoria = require("teoria");
-const { useState, useEffect} = React
+const { useState, useEffect } = React
 // const Song = require('./index.js')
-import { db, Song } from "./index";
+import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
 import Modal from "react-modal";
+import {midiRecorder} from "./midiRecorder";
+
 
 
 const meters_options = [
@@ -32,7 +34,7 @@ const meters_options = [
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
-    'C', 'C#/Db', 'D', 'D#/Eb', 'E', 'F', 'F#/Gb', 'G', 'G#/Ab', 'A', 'A#/Bb', 'B'
+    'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#','Bb', 'B'
 ];
 
 // /* ----- Model/View of Control Buttons ----- */
@@ -70,7 +72,7 @@ const bank = [{
     name: 'Open'
 }];
 
-const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', 'custom']
+const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', '%', 'custom']
 
 
 const customStyles = {
@@ -111,6 +113,13 @@ var songList = []
 // update those obj
 song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
+var player = document.getElementById('midi-player1');
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////// MIDI RECORDING ///////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+midiRecorder.init()
 
 
 function ChordEditor(props){
@@ -130,7 +139,12 @@ function ChordEditor(props){
             chord = customSel
         }
         else {
-            chord = selRoot+selType
+            if ( selType === '%'){
+                chord = selType
+            }
+            else{
+                chord = selRoot+selType
+            }
         }
 
         props.closeEditor(false, 0, chord.slice())
@@ -141,12 +155,17 @@ function ChordEditor(props){
         let type = chord.slice(1)
         chord = chord[0];
         setSelRoot(chord)
-        if ( chord_type.includes(type)){
+        if ( chord_type.includes(type) ){
             setSelType(type)
         }
         else {
-            setSelType('custom')
-            setCustomSel(chord+type)
+            if ( chord === '%' ){
+                setSelType('%')
+            }
+            else {
+                setSelType('custom')
+                setCustomSel(chord+type)
+            }
         }
     }
 
@@ -225,12 +244,35 @@ function ChordBlock(props){
         props.openEditor(true, props.index);
     }
 
+    const className = (index, slot, isPlaying) => {
+        var name = (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block";
+
+        if (index === isPlaying){
+            name = name.concat(" chord-selected")
+        }
+        return name;
+    }
+
+    const show = () => {
+        props.showChord(props.index)
+    }
+
+    const playChord = () => {
+        player.noteSequence = chordToNoteSequence(chart.MIDInote[props.index], 0, 3)
+        player.stop()
+        // Tone.Transport.clear()
+        Tone.Transport.stop()
+        player.start()
+        console.log(player.noteSequence)
+    }
 
     return (
-        <div className={ (props.index % (props.slot * 4) % props.slot === 0) ? "chord-block end-bar" : "chord-block"} >
+        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} onDoubleClick={playChord} >
             <i className="fas fa-edit edit" onClick={editChord}></i>
             <div className={"chord"}>{props.name}</div>
-            <div className={"degree"}>{props.degree}</div>
+            {props.name !== '%' && (
+                <div className={"degree"}>{props.degree}</div>
+            )}
         </div>
     )
 }
@@ -242,7 +284,8 @@ function ChordChart(props){
     const [midiNoteState, setMidiNoteState] = useState( () => chart.MIDInote)
     const [openModal, setOpenModal] = useState( () => false)
     const [newChord, setNewChord] = useState( () => "")
-    const [indexOfChord, setIndex] = useState( () => 0)
+    const [indexOfChordToModify, setIndexToModify] = useState( () => 0)
+    const [indexOfChordToPlay, setIndexToPlay] = useState( () => chart.chartModel.length + 1)
 
     useEffect(
         () => {
@@ -267,7 +310,7 @@ function ChordChart(props){
         setChartDegree([...chart.chartDegree])
         setSlotModel(chart.slotModel)
         setMidiNoteState([...chart.MIDInote])
-
+        setIndexToPlay(chart.chartModel.length+1)
     }
 
     const addBar = () => {
@@ -284,7 +327,7 @@ function ChordChart(props){
 
     const printChord = (name, index, degree, midi) => {
         return (
-        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor}/>
+        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor} isPlaying={indexOfChordToPlay} showChord={setIndexToPlay}/>
         )
     }
 
@@ -313,10 +356,25 @@ function ChordChart(props){
         return arr.map( (i, index)=> printLine(index, namesPerLine[index], degreesPerLine[index], midiPerLine[index]))
     }
 
+    const startPlaying = () => {
+        let i = 0;
+        var t;
+
+        var interval = setInterval(() => {
+            if ( i === chartModel.length ){
+                clearInterval(interval);
+            }
+            setIndexToPlay(i);
+            i++;
+        }, (1 / ( songInfo.bpm / 60 ))*1000);
+
+
+    }
+
     useEffect(
         () =>{
-            if ( newChord !== ""){
-                song.modifyChord(newChord, indexOfChord)
+            if ( newChord !== "" && newChord !== '%'){
+                song.modifyChord(newChord, indexOfChordToModify)
                 song.exportSongChart(chart)
                 updateStates()
             }
@@ -332,15 +390,36 @@ function ChordChart(props){
         }, [props.updateNewSong]
     )
 
+    useEffect(
+        () =>{
+            if ( props.isPlaying ){
+                startPlaying()
+                props.stopPlaying(false)
+            }
+            else {
+                setIndexToPlay(chartModel.length+1);
+            }
+        }, [props.isPlaying]
+    )
+
 
     const openEditor = (state, index, chord) => {
         if ( state ){
             let chord = chartModel[index]
-            setIndex(index)
+            setIndexToModify(index)
             setNewChord(chord)
         }
         else {
-            setNewChord(chord)
+            if ( chord === '%' ){
+                // find the last valid chord
+                let i
+                for ( i = 1; chartModel[indexOfChordToModify-i] === '%'; i++){}
+
+                setNewChord(chartModel[indexOfChordToModify-i])
+            }
+            else {
+                setNewChord(chord)
+            }
         }
 
         setOpenModal(state)
@@ -562,19 +641,42 @@ function LoadSongModal(props){
 
 /* ---------- Functions to add Control Buttons ---------- */
 function Buttons(props) {
+    const [isRecording, setRecording] = useState( () => false );
+
+
+    const startRecording = () => {
+        var recordBtn = document.getElementById("record").style.color = "red";
+        setRecording(true);
+        midiRecorder.setRecording(true);
+    }
+
+    const stopRecording = () => {
+        var recordBtn = document.getElementById("record").style.color = "inherit";
+        setRecording(false);
+        midiRecorder.setRecording(false);
+        console.log(midiRecorder.getNoteSequence())
+        player.noteSequence = midiRecorder.getNoteSequence();
+    }
+
+
 
     function Actions(id) {
         if(id === "new") {
             props.openNew(true)
         } else if(id === "play") {
-            null
+            chartToNoteSequence(songInfo, chart)
+            props.startPlaying(true)
         } else if(id === "pause") {
             null
         } else if(id === "stop") {
-            // todo remove
+            props.startPlaying(false);
+            // todo: remove
             handleClick()
         } else if(id === "record") {
-            null
+            if(!isRecording){
+                startRecording()
+            }
+            else stopRecording();
         } else if(id === "repeat") {
             null
         } else if(id === "save") {
@@ -590,7 +692,7 @@ function Buttons(props) {
             { props.btn.id === "open" ?
                 <input type="file" id="a-file" accept=".mid" hidden="hidden" /> : null
             }
-            <div key={props.btn.id} id={props.btn.id} className="button" onClick={() => Actions(props.btn.id)} >
+            <div key={props.btn.id} id={props.btn.id} className="button" onClick={() => Actions(props.btn.id)}>
                 { props.btn.id === "open" ?
                     <i className="material-icons" id="folder-btn">{props.btn.icon}</i> :
                     (props.btn.id == "record" ? <i className="material-icons record" id="folder-btn">{props.btn.icon}</i> :
@@ -610,7 +712,7 @@ function Ctrls(props) {
         <div id="control-buttons">
             {bank.map(
                 (btn) =>
-                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} />
+                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} startPlaying={props.startPlaying} />
             )}
         </div>
     );
@@ -672,6 +774,7 @@ function SongComponent(){
     const [modalCaller, setModalCaller] = useState( () => false)
     const [modalNew, setModalNew] = useState(() => false)
     const [newSongLoading, setNewSongLoading] = useState( () => false)
+    const [isPlaying, setIsPlaying] = useState( () => false)
 
     useEffect(
         () =>{
@@ -739,40 +842,18 @@ function SongComponent(){
                 </div>
             </div>
 
-            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew}/>
+            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying}/>
 
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
 
             <br/>
-            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading}/>
+            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying}/>
             <br/>
 
-            <div id="piano-roll">
-                <midi-visualizer
-                    type="waterfall"
-                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
-                </midi-visualizer>
-                <midi-visualizer
-                    type="staff"
-                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
-                </midi-visualizer>
 
-                <midi-player
-                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid"
-                    sound-font visualizer="#piano-roll midi-visualizer" id="midi-player1">
-                </midi-player>
 
-                <svg>
-                    <defs>
-                        <linearGradient id="keyGradient" x1="15%" x2="0%" y1="0" y2="100%">
-                            <stop stopColor="black" offset="60%"/>
-                            <stop stopColor="grey" offset="99%"/>
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
         </div>
     )
 }

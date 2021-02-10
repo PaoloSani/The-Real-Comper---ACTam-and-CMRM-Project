@@ -17,7 +17,7 @@
     border-radius: 5px;
     display: block;
     position: absolute;
-    width: fit-content;
+    width: 100vw;
     height: fit-content;
 }
 
@@ -58,6 +58,10 @@
     text-align: center;
 }
 
+.chord-selected {
+    background: #91b942;
+}
+
 .chord-block.right {
     border-radius: 0 4px 4px 0;
     border-right: 0;
@@ -74,10 +78,11 @@
 }
 
 .chart-line{
-    padding-right: 10px;
+    padding-right: 0px;
     padding-left: 0px;
-    display: flex;
-    width: 100%;
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
 }
 
 
