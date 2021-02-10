@@ -2,19 +2,31 @@ body {
   margin: 0;
   background:rgb(58, 138, 164);
   color: #222;
+  /* Hide scrollbar for IE, Edge and Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  height: fit-content;
+  min-height: 100vh;
+  user-select: none;
 }
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+body::-webkit-scrollbar {
+  display: none;
+}
+
 
 #music-info, #ctrl-btns div:not(.name) {
   display: inline-block;
 }
 
 h1 {
-  padding-top: 0;
+  padding-top: 3px;
   text-align: center;
   width: 100%;
   font-family: 'Parisienne', cursive;
   font-size: 50px;
-  margin-top: 5%;
+  margin-top: 0%;
   margin-bottom: 0;
 }
 
@@ -36,8 +48,8 @@ h2 {
 #music-info {
   position: relative;
   width: 230px;
-  height: 5vh;
-  top: 5%;
+  height: fit-content;
+  top: 0px;
   left: 10%;
 }
 
@@ -84,14 +96,13 @@ select:hover {
 
 #comper {
   width: 100vw;
-  height: 100vh;
-  padding: 10px;
+  height: fit-content;
+  /*padding: 5px;*/
   border-radius: 10px;
   vertical-align: middle;
   position: relative;
   left: 50%;
   transform: translateX(-50%);
-  overflow: scroll;
 }
 
 #meters {
@@ -127,6 +138,8 @@ select:hover {
   border-radius: 5px;
   display: -webkit-box;
   /* margin-top: 8vh; */
+  /*left: 50%;*/
+  /*transform: translateX(-50%);*/
 }
 
 .button {
@@ -149,14 +162,15 @@ select:hover {
 
 #chords {
   position: relative;
-  background-color: rgb(58, 138, 164);
   border-radius: 3px;
   width: fit-content;
   height: fit-content;
-  top: 3%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 15%;
+  /*left: 50%;*/
+  /*transform: translateX(-50%);*/
   text-align: center;
+  margin: auto;
+  width: 100vw;
 }
 
 #piano-roll {
@@ -173,9 +187,14 @@ select:hover {
 svg.waterfall-piano rect[original-fill="white"] {
   /*stroke: lightsteelblue;*/
   stroke: url(#keyGradient);
-
 }
+
 svg.waterfall-piano rect[original-fill="black"]:not(.active){
   stroke: none;
   fill: url(#keyGradient);
+}
+
+#midi-player1{
+  position: absolute;
+  display: none;
 }
