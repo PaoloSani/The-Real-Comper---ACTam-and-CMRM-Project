@@ -152,6 +152,14 @@ class Song{
         return this._title;
     }
 
+    transposeSong(newTonality){
+        var interval = teoria.interval(this.glob_tonality, newTonality);
+
+        for ( let i = 0; i < this.Chart.length; i++){
+            this.Chart[i] = this.Chart[i].chord().chord.transpose(interval);
+        }
+    }
+
     exportSongInfo(songInfo) {
 
         // updating songInfo properties
