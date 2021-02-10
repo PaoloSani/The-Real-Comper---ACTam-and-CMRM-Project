@@ -244,11 +244,30 @@ function ChordChart(props){
     const [newChord, setNewChord] = useState( () => "")
     const [indexOfChord, setIndex] = useState( () => 0)
 
+    useEffect(
+        () => {
+            if(props.newSongLoading){
+                updateStates()
+                props.setNewSongLoading(false)
+            }
+        },[props.newSongLoading]
+    )
+
+    useEffect(
+        () => {
+            console.log(chartModel)
+            console.log(chartDegree)
+            console.log(slotModel)
+            console.log(midiNoteState)
+            }, []
+    )
+
     const updateStates = () => {
         setChartModel([...chart.chartModel])
         setChartDegree([...chart.chartDegree])
         setSlotModel(chart.slotModel)
         setMidiNoteState([...chart.MIDInote])
+
     }
 
     const addBar = () => {
@@ -364,7 +383,7 @@ function NewSongInfo(props) {
         setSelMet(ts)
         setSelMetGroup(r)
     }
-    
+
     const showSongName = ({ target: { value } }) => {
         setSongName(value)
     }
@@ -399,8 +418,8 @@ function NewSongInfo(props) {
 
     return(
         <>
-            <Modal isOpen={isNewOpen} style={newModalStyle} onAfterOpen={openNew} ariaHideApp={false} onRequestClose={closeNew}> 
-                <div> 
+            <Modal isOpen={isNewOpen} style={newModalStyle} onAfterOpen={openNew} ariaHideApp={false} onRequestClose={closeNew}>
+                <div>
                     <span className="close" onClick={closeNew}>&times;</span>
                     <div className="modal-header">
                          <p>Add Song parameters</p>
@@ -436,7 +455,7 @@ function NewSongInfo(props) {
                              <p className="param-title">Key</p>
                          </div>
                          <div className="key-cntr">
-                             {key_options.map((key) => 
+                             {key_options.map((key) =>
                                  <div className={selKey == key ? "meter-btn selected" : "meter-btn"} onClick={() => handleKey(key)}>{key}</div>
                              )}
                          </div>
@@ -457,6 +476,16 @@ function LoadSongModal(props){
         props.setModalCaller(false)
     }
 
+    function loadSong(index) {
+        song = Song.parseSong(songList[index])
+        song.exportSongInfo(songInfo)
+        chart = {}
+        song.exportSongChart(chart)
+        console.log('i want to call the update function', songInfo,chart)
+        props.setNewSongLoading(true)
+        closeModal()
+    }
+
     useEffect(
         () => {
             if (props.isOpen){
@@ -469,12 +498,13 @@ function LoadSongModal(props){
                         // console.log(promiseArray)
                         promiseArray.forEach((docList, docListIndex) => {
                             songList.push(docListIndex)
-                            docList.forEach(song => songList.push(song.data()._title))
+                            docList.forEach(song => songList.push(song.data()/*._title*/))
                         });
                     }
                 )
-                    // .then(() => console.log('finito di caricare', songList))
-                    .then(() => setModalSongList([...songList]))
+                // .then(() => console.log('finito di caricare', songList))
+                // .then(() => setModalSongList([...songList]))
+                .then(() => setModalSongList(songList.map(i => (i instanceof Object) ? i._title : i)) )
             }
         }, [props.isOpen]
     )
@@ -507,7 +537,7 @@ function LoadSongModal(props){
                                         (songTitle === 0 | songTitle === 1) ?
                                             undefined
                                         :(
-                                            () => alert('selected song ' + index)
+                                            () => loadSong(index)
                                         )
                                     }
                                     className={
@@ -535,28 +565,21 @@ function Buttons(props) {
 
     function Actions(id) {
         if(id === "new") {
-            // PopupWindow()
             props.openNew(true)
         } else if(id === "play") {
             null
         } else if(id === "pause") {
             null
         } else if(id === "stop") {
+            // todo remove
             handleClick()
         } else if(id === "record") {
             null
         } else if(id === "repeat") {
             null
         } else if(id === "save") {
-            Song.loadFromFirebase('The Girl from Ipanema').then(songObj => song = songObj).then(() => {
-                console.log('loaded song from firebase')
-                song.exportSongInfo(songInfo)
-                song.exportSongChart(chart)
-                console.log(songInfo)
-                console.log(chart)
-            })
+            song.saveToFirebase()
         } else if(id === "open") {
-            // PopupWindow2()
             props.openModal(true)
             // OpenFile()
         }
@@ -694,7 +717,7 @@ function SongComponent(){
                 <div id="mtrs-opts">
                     <label>Meter:</label>
                     <select id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
-                        {meterType.signatures_set.map((mtrs) => 
+                        {meterType.signatures_set.map((mtrs) =>
                             <option value={mtrs}>{mtrs}</option>
                         )}
                     </select>
@@ -723,7 +746,7 @@ function SongComponent(){
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
 
             <br/>
-            <ChordChart key={glob_tonality}/>
+            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading}/>
             <br/>
 
             <div id="piano-roll">

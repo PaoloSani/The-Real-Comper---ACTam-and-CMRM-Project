@@ -230,7 +230,7 @@ class Song{
     }
 
     //@param String containing filename
-    //@return a Song obj
+    //@return a Song instance
     /*async*/ static loadPreset(songTitle) {
 
         //note: even if Synchronous XMLHttpRequest is deprecated, it gives me only a warning and not an error
@@ -274,7 +274,6 @@ class Song{
             // console.log(doc.data())
             return Song.parseSong(doc.data())
         });
-        // call Song.#parseSong();
     }
 
     // todo make parseSong private
@@ -375,8 +374,5 @@ function getSongList(){
 // console.log('chart', chart)
 
 
-// module.exports = meters_options
-// module.exports = Song
-//
-export { db, Song }
+export { Song }
 
