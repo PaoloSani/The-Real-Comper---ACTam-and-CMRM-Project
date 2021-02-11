@@ -141,12 +141,13 @@ class Song{
     }
 
     transposeSong(newTonality){
-        var interval = teoria.interval(this.glob_tonality, newTonality);
+        var interval = this.glob_tonality.tonic.interval(teoria.note(newTonality));
 
         for ( let i = 0; i < this.Chart.length; i++){
-            this.Chart[i] = this.Chart[i].chord().chord.transpose(interval);
+            var chord = this.Chart[i].chord.transpose(interval);
+            console.log(chord);
+            this.Chart[i].chord = chord;
         }
-        console.log(interval)
     }
 
     get meter(){

@@ -535,7 +535,7 @@ function NewSongInfo(props) {
                          </div>
                          <div className="key-cntr">
                              {key_options.map((key) =>
-                                 <div className={selKey == key ? "meter-btn selected" : "meter-btn"} onClick={() => handleKey(key)}>{key}</div>
+                                 <div className={selKey.split(' ')[0] == key ? "meter-btn selected" : "meter-btn"} onClick={() => handleKey(key.split(' ')[0])}>{key.split(' ')[0]}</div>
                              )}
                          </div>
                      </div>
@@ -799,7 +799,7 @@ function SongComponent(){
         song.exportSongInfo(songInfo)
         song.exportSongChart(chart)
         setNewSongLoading(true)
-        console.log(chart)
+        console.log(song)
     }
 
     // TODO: update modal
