@@ -52,8 +52,8 @@ const meters_options = [
 class Chord {
 
     constructor(chord, tonality) {
-        this.chord = chord;
         this.tonality = tonality;
+        this.chord = chord;
     }
 
     get chord() {
@@ -63,7 +63,8 @@ class Chord {
     // value can be either a string or a chord obj
     set chord(value) {
         if(!(value instanceof teoria.Chord)){
-            !(value == null) ? this._chord = teoria.chord(value) : this._chord = teoria.chord('Cmaj');
+            var root = this.tonality.tonic.name().toUpperCase() + this.tonality.tonic.accidental();
+            !(value == null) ? this._chord = teoria.chord(value) : this._chord = teoria.chord(root + 'maj');
         }else{
             this._chord = value;
         }
@@ -96,7 +97,7 @@ class Song{
 
     addBar(){
         for ( let i = 0; i < this.meterType.slot; i++){
-            var c = new Chord(null, this.glob_tonality.tonic.name() + ' ' + this.glob_tonality.name);
+            var c = new Chord(null, this.glob_tonality.tonic.name() + this.glob_tonality.tonic.accidental() + ' ' + this.glob_tonality.name);
             this._chart.push(c);
         }
     }
@@ -145,9 +146,9 @@ class Song{
 
         for ( let i = 0; i < this.Chart.length; i++){
             var chord = this.Chart[i].chord.transpose(interval);
-            console.log(chord);
             this.Chart[i].chord = chord;
         }
+        this.glob_tonality = newTonality + ' major';
     }
 
     get meter(){
@@ -169,7 +170,7 @@ class Song{
         songInfo.meterType = this.meterType
         songInfo.meter = this.meter[0] + '/' + this.meter[1]
         songInfo.bpm = this.bpm
-        songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + ' ' + this.glob_tonality.name
+        songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + this.glob_tonality.tonic.accidental() + ' ' + this.glob_tonality.name
     }
 
     exportSongChart(chartObject){

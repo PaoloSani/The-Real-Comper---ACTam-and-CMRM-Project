@@ -296,15 +296,6 @@ function ChordChart(props){
         },[props.newSongLoading]
     )
 
-    useEffect(
-        () => {
-            console.log(chartModel)
-            console.log(chartDegree)
-            console.log(slotModel)
-            console.log(midiNoteState)
-            }, []
-    )
-
     const updateStates = () => {
         setChartModel([...chart.chartModel])
         setChartDegree([...chart.chartDegree])
@@ -445,8 +436,7 @@ function ChordChart(props){
 
 function NewSongInfo(props) {
     const [isNewOpen, setIsNewOpen] = useState(false)
-    var keyName = songInfo.glob_tonality.split(' ')[0]
-    const [selKey, setSelKey] = useState(keyName)
+    const [selKey, setSelKey] = useState(songInfo.glob_tonality)
     const [selMetGroup, setSelMetGroup] = useState(0)
     const [selMet, setSelMet] = useState(songInfo.meter)
     const [songName, setSongName] = useState({value: ""})
@@ -455,6 +445,7 @@ function NewSongInfo(props) {
     const handleKey = (e) => {
         const ko = key_options.find(k => k == e)
         setSelKey(ko + ' major')
+
     }
 
     const handleMeter = (r, e) => {
@@ -482,14 +473,14 @@ function NewSongInfo(props) {
     const openNew = () => {
         setSelMet(songInfo.meter)
         setSongBpm(songInfo.bpm)
-        setSelKey(keyName)
+        setSelKey(songInfo.glob_tonality)
         setSongName(songInfo.title)
     }
 
     const closeNew = () => {
         setIsNewOpen(false)
         props.setModalNew(false)
-        song = new Song(songName, selMet, songBpm, 'C major', selMetGroup)
+        song = new Song(songName, selMet, songBpm, selKey, selMetGroup)
         song.exportSongInfo(songInfo)
         song.exportSongChart(chart)
         props.setNewSongLoading(true)
@@ -517,7 +508,7 @@ function NewSongInfo(props) {
                                  (mtrs, ix) =>
                                      <div className="mtr-cntr" key={mtrs.group} id={mtrs.group}>
                                          { mtrs.signatures_set.map((vals) =>
-                                             <div className={(selMetGroup == ix && selMet == vals) ? "meter-btn selected" : "meter-btn"} onClick={() => handleMeter(ix, vals)}>{vals}</div>
+                                             <div className={(selMetGroup === ix && selMet === vals) ? "meter-btn selected" : "meter-btn"} onClick={() => handleMeter(ix, vals)}>{vals}</div>
                                          )}
                                      </div>
                              )}
@@ -775,8 +766,7 @@ function SongComponent(){
                 setMeter(songInfo.meter)
                 setMeterType(songInfo.meterType)
                 setBpm(songInfo.bpm)
-                setGlob_tonality(songInfo.glob_tonality)
-                setNewSongLoading(false)
+                setGlob_tonality(songInfo.glob_tonality.split(' ')[0])
             }
         }, [newSongLoading]
     )
@@ -795,11 +785,11 @@ function SongComponent(){
 
     const showKey = ({ target: { value } }) => {
         setGlob_tonality(value)
+        setNewSongLoading(false)
         song.transposeSong(value)
         song.exportSongInfo(songInfo)
         song.exportSongChart(chart)
         setNewSongLoading(true)
-        console.log(song)
     }
 
     // TODO: update modal
