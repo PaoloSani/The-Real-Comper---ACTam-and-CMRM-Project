@@ -255,6 +255,7 @@ function ChordBlock(props){
 
     const show = () => {
         props.showChord(props.index)
+        playChord()
     }
 
     const playChord = () => {
@@ -267,8 +268,7 @@ function ChordBlock(props){
     }
 
     return (
-        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} onDoubleClick={playChord} >
-            <i className="fas fa-edit edit" onClick={editChord}></i>
+        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} onDoubleClick={editChord} >
             <div className={"chord"}>{props.name}</div>
             {props.name !== '%' && (
                 <div className={"degree"}>{props.degree}</div>
@@ -560,7 +560,7 @@ function LoadSongModal(props){
         song.exportSongInfo(songInfo)
         chart = {}
         song.exportSongChart(chart)
-        console.log('i want to call the update function', songInfo,chart)
+        console.log('i want to call the update function', songInfo, chart)
         props.setNewSongLoading(true)
         closeModal()
     }
@@ -666,12 +666,11 @@ function Buttons(props) {
         } else if(id === "play") {
             chartToNoteSequence(songInfo, chart)
             props.startPlaying(true)
+            player.start()
         } else if(id === "pause") {
             null
         } else if(id === "stop") {
             props.startPlaying(false);
-            // todo: remove
-            handleClick()
         } else if(id === "record") {
             if(!isRecording){
                 startRecording()
@@ -757,13 +756,6 @@ function PopupWindow() {
     }
 }
 
-function handleClick(){
-    // force a re-render
-    console.log('forcing render')
-    // document.getElementById("comper").innerHTML = '';
-    ReactDOM.unmountComponentAtNode(document.getElementById("comper"))
-    ReactDOM.render(<SongComponent />, root)
-}
 
 function SongComponent(){
     const [title, setTitle] = useState( () => songInfo.title)
