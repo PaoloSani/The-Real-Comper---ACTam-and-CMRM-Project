@@ -8,6 +8,7 @@ var midiRecorder = {
     timeStampArray: new Array(127).fill(0),
     soundFontPlayer: new core.SoundFontPlayer('https://storage.googleapis.com/magentadata/js/soundfonts/sgm_plus'),
     velocity: new Array(127).fill(0),
+    inputName: 'default',
 
     init: function() {
 
@@ -54,6 +55,7 @@ var midiRecorder = {
         function onMIDISuccess(midiAccess) {
             var inputs = midiAccess.inputs.values();
             for (var input of inputs) {
+                this.inputName = input.name;
                 input.onmidimessage = onMIDIMessage; //sets up the MIDI listener
             }
         }
@@ -82,7 +84,9 @@ var midiRecorder = {
         return this.noteSequence;
     },
 
-
+    getInputName(){
+        return this.inputName;
+    }
 };
 
 export {midiRecorder}

@@ -268,7 +268,8 @@ function ChordBlock(props){
     }
 
     return (
-        <div className={ className(props.index, props.slot, props.isPlaying)} onClick={show} onDoubleClick={editChord} >
+        <div key = {props.index} className={ className(props.index, props.slot, props.isPlaying)} onClick={show} >
+            <i className="icon-edit" onClick={editChord}/>
             <div className={"chord"}>{props.name}</div>
             {props.name !== '%' && (
                 <div className={"degree"}>{props.degree}</div>
@@ -489,7 +490,7 @@ function NewSongInfo(props) {
 
     return(
         <>
-            <Modal isOpen={isNewOpen} style={newModalStyle} onAfterOpen={openNew} ariaHideApp={false} onRequestClose={closeNew}>
+            <Modal key={1} isOpen={isNewOpen} style={newModalStyle} onAfterOpen={openNew} ariaHideApp={false} onRequestClose={closeNew}>
                 <div>
                     <span className="close" onClick={closeNew}>&times;</span>
                     <div className="modal-header">
@@ -704,8 +705,8 @@ function Ctrls(props) {
     return(
         <div id="control-buttons">
             {bank.map(
-                (btn) =>
-                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} startPlaying={props.startPlaying} generateVoicing={props.generateVoicing}/>
+                (btn, index) =>
+                    <Buttons key={index} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} startPlaying={props.startPlaying} generateVoicing={props.generateVoicing}/>
             )}
         </div>
     );
