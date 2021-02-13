@@ -64,7 +64,7 @@ class Chord {
     set chord(value) {
         if(!(value instanceof teoria.Chord)){
             var root = this.tonality.tonic.name().toUpperCase() + this.tonality.tonic.accidental();
-            !(value == null) ? this._chord = teoria.chord(value) : this._chord = teoria.chord(root + 'maj');
+            !(value == null) ? this._chord = teoria.chord(value, 3) : this._chord = teoria.chord(root + 'maj', 3);
         }else{
             this._chord = value;
         }
@@ -325,6 +325,8 @@ class Song{
             // })
     }
 
+
+
 }
 
 
@@ -440,10 +442,8 @@ function chartToNoteSequence(songInfo, chart){
     //     }
     // )
 
-    var player = document.getElementById('midi-player1')
-
-    player.noteSequence = chartNoteSequence;
-    console.log(chartNoteSequence)
+    return chartNoteSequence;
 }
+
 
 export { db, Song, chordToNoteSequence, chartToNoteSequence }

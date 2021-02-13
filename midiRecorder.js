@@ -73,7 +73,8 @@ var midiRecorder = {
 
         if ( value ){
             this.noteSequence.notes = [];
-            this.initialTimeStamp = performance.now();
+            this.initialTimeStamp = performance.now() + 100;
+            console.log(performance.now())
         }
     },
 

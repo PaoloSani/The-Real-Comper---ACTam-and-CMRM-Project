@@ -6,7 +6,7 @@ const { useState, useEffect } = React
 import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
-
+import {createProgression} from "./voicingCreator";
 
 
 const meters_options = [
@@ -47,10 +47,6 @@ const bank = [{
     icon: 'play_arrow',
     name: 'Play'
 }, {
-    id: 'pause',
-    icon: 'pause',
-    name: 'Pause'
-}, {
     id: 'stop',
     icon: 'stop',
     name: 'Stop'
@@ -58,6 +54,10 @@ const bank = [{
     id: 'record',
     icon: 'fiber_manual_record',
     name: 'Record'
+},{
+    id: 'generate',
+    icon: 'piano',
+    name: 'Generate'
 }, {
     id: 'repeat',
     icon: 'repeat',
@@ -106,6 +106,7 @@ song.Chart[0].chord='C6/9'
 song.Chart[1].chord='Am7'
 song.Chart[2].chord='Dm7'
 song.Chart[3].chord='G7'
+
 
 let songInfo = {};
 let chart = {};
@@ -264,7 +265,6 @@ function ChordBlock(props){
         // Tone.Transport.clear()
         Tone.Transport.stop()
         player.start()
-        console.log(player.noteSequence)
     }
 
     return (
@@ -302,6 +302,7 @@ function ChordChart(props){
         setSlotModel(chart.slotModel)
         setMidiNoteState([...chart.MIDInote])
         setIndexToPlay(chart.chartModel.length+1)
+        player.noteSequence = chartToNoteSequence(songInfo, chart);
     }
 
     const addBar = () => {
@@ -358,8 +359,6 @@ function ChordChart(props){
             setIndexToPlay(i);
             i++;
         }, (1 / ( songInfo.bpm / 60 ))*1000);
-
-
     }
 
     useEffect(
@@ -374,15 +373,6 @@ function ChordChart(props){
 
     useEffect(
         () =>{
-            if ( props.updateNewSong ){
-                song.exportSongChart(chart)
-                updateStates()
-            }
-        }, [props.updateNewSong]
-    )
-
-    useEffect(
-        () =>{
             if ( props.isPlaying ){
                 startPlaying()
                 props.stopPlaying(false)
@@ -391,6 +381,17 @@ function ChordChart(props){
                 setIndexToPlay(chartModel.length+1);
             }
         }, [props.isPlaying]
+    )
+
+    useEffect(
+        () =>{
+            if ( props.newVoicing ){
+                createProgression(song, midiRecorder.getNoteSequence())
+                song.exportSongChart(chart)
+                updateStates()
+                props.setNewVoicing(false)
+            }
+        }, [props.newVoicing]
     )
 
 
@@ -637,6 +638,7 @@ function Buttons(props) {
 
     const startRecording = () => {
         var recordBtn = document.getElementById("record").style.color = "red";
+        player.start();
         setRecording(true);
         midiRecorder.setRecording(true);
     }
@@ -645,8 +647,8 @@ function Buttons(props) {
         var recordBtn = document.getElementById("record").style.color = "inherit";
         setRecording(false);
         midiRecorder.setRecording(false);
-        console.log(midiRecorder.getNoteSequence())
-        player.noteSequence = midiRecorder.getNoteSequence();
+        midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
+        console.log(player.noteSequence)
     }
 
 
@@ -655,11 +657,12 @@ function Buttons(props) {
         if(id === "new") {
             props.openNew(true)
         } else if(id === "play") {
-            chartToNoteSequence(songInfo, chart)
             props.startPlaying(true)
             player.start()
-        } else if(id === "pause") {
-            null
+            console.log(player.noteSequence)
+        } else if(id === "generate") {
+            props.generateVoicing(true);
+
         } else if(id === "stop") {
             props.startPlaying(false);
         } else if(id === "record") {
@@ -702,7 +705,7 @@ function Ctrls(props) {
         <div id="control-buttons">
             {bank.map(
                 (btn) =>
-                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} startPlaying={props.startPlaying} />
+                    <Buttons key={btn} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} startPlaying={props.startPlaying} generateVoicing={props.generateVoicing}/>
             )}
         </div>
     );
@@ -714,7 +717,7 @@ function OpenFile() {
     const real_btn = document.getElementById("a-file");
     const folder_btn = document.getElementById("folder-btn");
 
-    folder_btn.addEventListener("click", function() {
+    folder_btn.EventListener("click", function() {
         real_btn.click();
     });
 
@@ -756,8 +759,9 @@ function SongComponent(){
     const [glob_tonality, setGlob_tonality] = useState( () => songInfo.glob_tonality)
     const [modalCaller, setModalCaller] = useState( () => false)
     const [modalNew, setModalNew] = useState(() => false)
-    const [newSongLoading, setNewSongLoading] = useState( () => false)
-    const [isPlaying, setIsPlaying] = useState( () => false)
+    const [newSongLoading, setNewSongLoading] = useState(() => false)
+    const [isPlaying, setIsPlaying] = useState(() => false)
+    const [newVoicing, setNewVoicing] = useState(() => false)
 
     useEffect(
         () =>{
@@ -792,8 +796,6 @@ function SongComponent(){
         setNewSongLoading(true)
     }
 
-    // TODO: update modal
-
     return(
         <div id = "wrapper">
             <h1>THE REAL COMPER</h1>
@@ -824,14 +826,14 @@ function SongComponent(){
                 </div>
             </div>
 
-            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying}/>
+            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying} generateVoicing={setNewVoicing}/>
 
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
 
             <br/>
-            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying}/>
+            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying} newVoicing={newVoicing} setNewVoicing={setNewVoicing}/>
             <br/>
 
 
