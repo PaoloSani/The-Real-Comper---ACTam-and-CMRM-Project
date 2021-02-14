@@ -74,8 +74,6 @@ class Chord {
     set chord(value) {
         if(!(value instanceof teoria.Chord)){
             var root = this.tonality.tonic.name().toUpperCase() + this.tonality.tonic.accidental();
-            // !(value == null) ? this._chord = teoria.chord(value, 3) : this._chord = teoria.chord(root + 'maj', 3);
-            // !(value == null) ? this._chord = teoria.chord(value, 3) : this._chord = teoria.chord(root + ' ' + this.tonality.name.substring(0,3), 3);
             this._chord = !(value == null) ? teoria.chord(value, 3) : teoria.chord(root + this.tonality.name.substring(0,3), 3);
         }else{
             this._chord = value;
@@ -178,7 +176,6 @@ class Song{
     }
 
     exportSongInfo(songInfo) {
-
         // updating songInfo properties
         songInfo.title = this.title
         songInfo.meterType = this.meterType
@@ -225,24 +222,10 @@ class Song{
         this._chart[index].chord = chord;
     }
 
-    // @param a Song instance to be saved to a file
-    saveSongTofile(){
-
-        console.log('saving song ', this.title);
-        // localStorage.setItem(this.title, JSON.stringify(this));
-        var blob = new Blob( [JSON.stringify(this)], {
-            type: 'application/octet-stream'
-        });
-        var url = URL.createObjectURL( blob );
-        var link = document.createElement( 'a' );
-        link.id = 'downloadTag';
-        link.href = url;
-        link.download = this.title + '.json';
-        link.click();
-        window.URL.revokeObjectURL(url);
-    }
-
-    //save current song to firebase
+    /**
+     * Saves current song to firebase
+     * @param collectionName: location folder in which the file must be saved
+     */
     async saveToFirebase(collectionName) {
 
         collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "presets"
@@ -252,55 +235,28 @@ class Song{
         );
     }
 
-    //@param String containing filename
-    //@return a Song instance
-    /*async*/ static loadPreset(songTitle) {
-
-        //note: even if Synchronous XMLHttpRequest is deprecated, it gives me only a warning and not an error
-        console.log('loading song ', songTitle);
-        var parsedSong;
-
-        // make the http request to get the json file
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function () {
-            if (this.readyState == 4 && this.status == 200) {
-                parsedSong = JSON.parse(xhttp.responseText);
-                // console.log(xhttp.responseText)
-            }
-        };
-        xhttp.open("GET", "presets/" + songTitle + ".json", false);
-        xhttp.send();
-
-        // const request = async () => {
-        //     const response = await fetch("presets/" + songTitle+ ".json");
-        //     const json = await response.json();
-        //     return json;
-        // }
-        // parsedSong = await request();
-
-        // fetch('./presets/The Girl from Ipanema.json').then(result => result.json()).then(console.log);
-
-        // var parsedSong = JSON.parse(localStorage.getItem(songTitle));
-        // parsedSong = parseFromFirebase(songTitle)
-        // console.log('parsedSong', parsedSong)
-        // return Song.#parseSong(parsedSong)
-        return Song.parseSong(parsedSong)
-    }
-
-    //@param String containing filename
+    /**
+     *
+     * @param songTitle: name of the song
+     * @param collectionName: collection in which the title must be searched
+     * @return {*}: a Song instance
+     */
     static loadFromFirebase(songTitle, collectionName) {
 
         // put collection to song if not specified
         collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
         return db.collection(collectionName).doc(songTitle).get().then(function(doc){
             console.log('loading from firebase')
-            // console.log(doc.data())
             return Song.parseSong(doc.data())
         });
     }
 
-    //@param parsed song Object
-    //@return a song instance
+
+    /**
+     *
+      * @param parsedSong: Object
+     * @return {Song}: a song instance
+     */
     static parseSong(parsedSong){
 
         var instance = new Song("song"); //just to have all methods
@@ -328,7 +284,10 @@ class Song{
         return instance;
     }
 
-    //@param collection name: songs or presets
+    /**
+     *  @param collectionName: songs or presets
+     */
+
     static getSongList(collectionName){
 
         collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
@@ -343,68 +302,6 @@ class Song{
 
 
 }
-
-
-//button function handler
-/*
-window.onload = function(){
-    document.getElementById("save").addEventListener("click", () => saveSongTofile(newSong));
-
-    const folder_btn = document.getElementById("folder-btn");
-    folder_btn.addEventListener("click", function() {
-        // getSongList();
-        // real_btn.click();
-        loadSong("The Girl from Ipanema")
-    });
-};
-*/
-
-// todo: delete
-// function getSongList(){
-//     console.log('getSongList called')
-//     fetch('./presets/Preset list.json') //per ora non esiste il file
-//         .then(result =>result.json())
-//         .then(console.log)
-// }
-
-
-
-// ----------------------------------------------------------------------------
-// example / testing program
-
-
-// create a new song
-// var newSong = new Song('The Girl from Ipanema', '5/4', 130, 'C major');
-// console.log(newSong);
-
-// create obj for react
-// let songInfo ={};
-// let chart = {};
-
-// update those obj
-
-
-// print (a copy!) of the obj just populated
-// console.log('songInfo', JSON.parse(JSON.stringify(songInfo)))
-// console.log('chart', JSON.parse(JSON.stringify(chart)))
-//
-// console.log('.....\n\n\n\n....')
-// load a new song from host preset folder
-// newSong = /*await*/ Song.loadPreset('The Girl from Ipanema awkward')
-
-
-// setTimeout(newSong.exportSimplifiedSong(songInfo, chart),2000)
-// newSong.exportSongInfo(songInfo)
-// newSong.exportSongChart(chart)
-// console.log('songInfo', songInfo)
-// console.log('chart', chart)
-
-
-// module.exports = meters_options
-// module.exports = Song
-//
-
-
 
 function chordToNoteSequence(midiChord, start, end){
 
