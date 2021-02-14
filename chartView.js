@@ -1,8 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-const teoria = require("teoria");
 const { useState, useEffect } = React
-// const Song = require('./index.js')
 import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
@@ -31,7 +29,6 @@ const meters_options = [
         slot: 7,
     },
 ]
-
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
     'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#','Bb', 'B'
@@ -74,7 +71,6 @@ const bank = [{
 
 const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', '%', 'custom']
 
-
 const customStyles = {
     content : {
         top                   : '50%',
@@ -102,6 +98,7 @@ const newModalStyle = {
 var song = new Song('Prova');
 
 
+//default initialization
 song.Chart[0].chord='C6/9'
 song.Chart[1].chord='Am7'
 song.Chart[2].chord='Dm7'
@@ -122,7 +119,9 @@ var player = document.getElementById('midi-player1');
 
 midiRecorder.init()
 
-
+/**
+ * ChordEditor is the Modal for modifying the single selected chord in the chart
+ */
 function ChordEditor(props){
     const [isOpen, setIsOpen] = useState(false)
     const [selRoot, setSelRoot] = useState(() => props.chord.name)
@@ -239,6 +238,9 @@ function ChordEditor(props){
     )
 }
 
+/**
+ * ChordBlock a single chord entity in the chart
+ */
 function ChordBlock(props){
 
     const editChord = () => {
@@ -278,6 +280,9 @@ function ChordBlock(props){
     )
 }
 
+/**
+ * ChordChart manages the representation of the chords present in the song chart.
+ */
 function ChordChart(props){
     const [chartModel, setChartModel] = useState( () => chart.chartModel )
     const [chartDegree, setChartDegree] = useState(() => chart.chartDegree)
@@ -436,6 +441,9 @@ function ChordChart(props){
     )
 }
 
+/**
+ *  NewSongInfo is the Modal for the creation of a new song
+ */
 function NewSongInfo(props) {
     const [isNewOpen, setIsNewOpen] = useState(false)
     const [selKey, setSelKey] = useState(songInfo.glob_tonality)
@@ -538,6 +546,9 @@ function NewSongInfo(props) {
     )
 }
 
+/**
+ * LoadSongModal is the Modal for downloading an existing song from Firebase
+ */
 function LoadSongModal(props){
     const [modalSongList, setModalSongList] = useState(() => songList)
     const [isOpen, setIsOpen] = useState(() => false)
@@ -632,7 +643,9 @@ function LoadSongModal(props){
     )
 }
 
-/* ---------- Functions to add Control Buttons ---------- */
+/**
+ * Buttons manages the representation and the actions of the buttons
+ */
 function Buttons(props) {
     const [isRecording, setRecording] = useState( () => false );
 
@@ -699,8 +712,9 @@ function Buttons(props) {
     )
 }
 
+
+// TODO: collapse it into buttons?
 function Ctrls(props) {
-    const [lastClick, setLastClick] = useState("")
 
     return(
         <div id="control-buttons">
@@ -713,6 +727,7 @@ function Ctrls(props) {
 }
 
 
+//TODO: delete?
 /* ---------- Open file function ---------- */
 function OpenFile() {
     const real_btn = document.getElementById("a-file");
@@ -727,6 +742,8 @@ function OpenFile() {
     });
 }
 
+
+//TODO: delete?
 /* ---------- Popup window ---------- */
 function PopupWindow() {
     // Get the modal
@@ -751,7 +768,9 @@ function PopupWindow() {
     }
 }
 
-
+/**
+ * SongComponent is the general React component for the app, it manages the general info of the song and act a Parent component for communicating children
+ */
 function SongComponent(){
     const [title, setTitle] = useState( () => songInfo.title)
     const [meterType, setMeterType] = useState( () => songInfo.meterType)
