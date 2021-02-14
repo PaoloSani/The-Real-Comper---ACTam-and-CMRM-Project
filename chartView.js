@@ -155,7 +155,7 @@ function ChordEditor(props){
         let chord = toCut;
         let type;
 
-        if ( chord.includes('b') || chord.includes('#') ){
+        if ( chord[1] === 'b' || chord[1] === '#' ){
             chord = chord[0] + chord[1];
             type = toCut.slice(2);
         }
@@ -667,13 +667,14 @@ function Buttons(props) {
 
 
     const startRecording = () => {
-        var recordBtn = document.getElementById("record").style.color = "red";
+        document.getElementById("record").style.color = "red";
         player.start();
         setRecording(true);
         midiRecorder.setRecording(true);
     }
 
     const stopRecording = () => {
+        document.getElementById("record").style.color = "inherit";
         setRecording(false);
         midiRecorder.setRecording(false);
         midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
