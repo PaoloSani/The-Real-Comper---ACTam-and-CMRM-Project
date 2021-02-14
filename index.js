@@ -1,6 +1,6 @@
-//no comment
 const teoria = require("teoria");
-import 'regenerator-runtime/runtime'
+import 'regenerator-runtime/runtime';
+import {beatsTimeStamp} from "./beatsTimeStamp";
 
 // Your web app's Firebase configuration
 var firebaseConfig = {
@@ -29,22 +29,32 @@ function meterToIntArray(string){
 const meters_options = [
     {
         group: 'Group A',
-        signatures_set: ['4/4', '17/16', '5/4'],
+        signatures_set: ['4/4', '17/16', '5/4', '9/8'],
+        durationRatio: {
+            0: [1,1,1,1],
+            1: [1,1,1,5/4],
+            2: [1,1,1,2],
+            3: [1,1,1,3/2]},
         slot: 4,
     },
     {
         group: 'Group B',
         signatures_set: ['3/4', '7/8'],
+        durationRatio: [
+            [1,1,1],
+            [1,1,3/2]],
         slot: 3,
     },
     {
         group: 'Group C',
         signatures_set: ['5/4'],
+        durationRatio: [[1,1,1,1,1]],
         slot: 5,
     },
     {
         group: 'Group D',
         signatures_set: ['7/4'],
+        durationRatio: [[1,1,1,1,1,1,1]],
         slot: 7,
     },
 ]
@@ -64,7 +74,9 @@ class Chord {
     set chord(value) {
         if(!(value instanceof teoria.Chord)){
             var root = this.tonality.tonic.name().toUpperCase() + this.tonality.tonic.accidental();
-            !(value == null) ? this._chord = teoria.chord(value, 3) : this._chord = teoria.chord(root + 'maj', 3);
+            // !(value == null) ? this._chord = teoria.chord(value, 3) : this._chord = teoria.chord(root + 'maj', 3);
+            // !(value == null) ? this._chord = teoria.chord(value, 3) : this._chord = teoria.chord(root + ' ' + this.tonality.name.substring(0,3), 3);
+            this._chord = !(value == null) ? teoria.chord(value, 3) : teoria.chord(root + this.tonality.name.substring(0,3), 3);
         }else{
             this._chord = value;
         }
@@ -86,7 +98,8 @@ class Chord {
 
 class Song{
     constructor(title, meter, bpm, tonality, meterIndex) {
-        this.meter = meterToIntArray(meter || meters_options[0].signatures_set[0]);
+        // this.meter = meterToIntArray(meter || meters_options[0].signatures_set[0]);
+        this.meter = (meter || meters_options[0].signatures_set[0]);
         this.meterType = meters_options[meterIndex] || meters_options[0];
         this.bpm = bpm || 120;
         this.glob_tonality = tonality || 'C major';
@@ -139,6 +152,7 @@ class Song{
 
     get glob_tonality(){
         return this._tonality;
+        return this._tonality;
     }
 
     transposeSong(newTonality){
@@ -168,7 +182,8 @@ class Song{
         // updating songInfo properties
         songInfo.title = this.title
         songInfo.meterType = this.meterType
-        songInfo.meter = this.meter[0] + '/' + this.meter[1]
+        // songInfo.meter = this.meter[0] + '/' + this.meter[1]
+        songInfo.meter = (typeof this.meter === "string") ? this.meter : this.meter[0] + '/' + this.meter[1]
         songInfo.bpm = this.bpm
         songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + this.glob_tonality.tonic.accidental() + ' ' + this.glob_tonality.name
     }
@@ -230,12 +245,11 @@ class Song{
     //save current song to firebase
     async saveToFirebase(collectionName) {
 
-        collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
+        collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "presets"
         console.log('saving song to firebase "', this.title, '" in ',collectionName);
         db.collection(collectionName).doc(this.title).set(
             JSON.parse(JSON.stringify(this))
         );
-
     }
 
     //@param String containing filename
@@ -285,13 +299,14 @@ class Song{
         });
     }
 
-    // todo make parseSong private
     //@param parsed song Object
     //@return a song instance
     static parseSong(parsedSong){
 
-        var instance = new Song("song"); //just to have all methods and submethod
+        var instance = new Song("song"); //just to have all methods
         Object.assign(instance, parsedSong); //instance is now a Song class obj with methods, but not submethods
+
+        instance.meterType = meters_options.filter(value => value.group === (instance.meterType.group))[0]
 
         instance.glob_tonality = deserializeScale(parsedSong._tonality)
 
@@ -344,13 +359,13 @@ window.onload = function(){
 };
 */
 
-
-function getSongList(){
-    console.log('getSongList called')
-    fetch('./presets/Preset list.json') //per ora non esiste il file
-        .then(result =>result.json())
-        .then(console.log)
-}
+// todo: delete
+// function getSongList(){
+//     console.log('getSongList called')
+//     fetch('./presets/Preset list.json') //per ora non esiste il file
+//         .then(result =>result.json())
+//         .then(console.log)
+// }
 
 
 
@@ -412,7 +427,9 @@ function chartToNoteSequence(songInfo, chart){
         totalTime: 0
     }
 
-    var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
+    // var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
+    var chordTimeStamp = beatsTimeStamp(songInfo, chart)
+    console.log(chordTimeStamp)
 
     var repeat = 0;
 
@@ -422,10 +439,10 @@ function chartToNoteSequence(songInfo, chart){
 
         if ( JSON.stringify(curr)!== JSON.stringify(next)){
             let index = i;
-            chordToNoteSequence(curr,(index-repeat)*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+            chordToNoteSequence(curr,chordTimeStamp[index-repeat],chordTimeStamp[index+1]).notes.forEach(i => {
                 chartNoteSequence.notes.push(i)
             })
-            chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+            // chartNoteSequence.totalTime = chordTimeStamp[index+1];
             repeat = 0;
         }
         else {
@@ -433,17 +450,18 @@ function chartToNoteSequence(songInfo, chart){
         }
     }
 
-    // console.log(chart.MIDInote[0]);
+    // noteSquence with repeated chords
     // chart.MIDInote.forEach((i,index) => {
-    //         chordToNoteSequence(i,index*quarterNoteDuration,(index+1)*quarterNoteDuration).notes.forEach(i => {
+    //         chordToNoteSequence(i,chordTimeStamp[index],chordTimeStamp[index+1]).notes.forEach(i => {
     //             chartNoteSequence.notes.push(i)
     //         })
-    //         chartNoteSequence.totalTime = (index+1)*quarterNoteDuration;
+    //         chartNoteSequence.totalTime = chordTimeStamp[index+1];
     //     }
     // )
+
+    chartNoteSequence.totalTime = chordTimeStamp[chordTimeStamp.length-1];
 
     return chartNoteSequence;
 }
 
-
-export { db, Song, chordToNoteSequence, chartToNoteSequence }
+export { db, Song, chordToNoteSequence, chartToNoteSequence , meters_options }

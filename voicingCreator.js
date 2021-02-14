@@ -1,4 +1,5 @@
 import teoria from "teoria";
+import { beatsTimeStamp } from "./beatsTimeStamp";
 
 function checkRange(chord){
     if (chord.notes()[0].octave() > 3 ){
@@ -174,8 +175,10 @@ function createProgression( song, melodyNoteSequence ){
                 prevChord = song.Chart[i-repeat-1].chord;
             }
 
-            chordStart = (i-repeat)*quarterNote;
-            chordEnd = (i+1)*quarterNote;
+            // chordStart = (i-repeat)*quarterNote;
+            // chordEnd = (i+1)*quarterNote;
+            chordStart = beatsTimeStamp[i-repeat];
+            chordEnd = beatsTimeStamp[i+1];
 
             // take the intervals of the notes played over the chord with respect to the root
             root = currChord.root;
