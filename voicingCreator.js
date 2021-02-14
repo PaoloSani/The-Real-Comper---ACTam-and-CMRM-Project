@@ -1,5 +1,9 @@
 import teoria from "teoria";
 
+/**
+ * checkRange transpose a chord in order to fit the best range of the keyboard
+ * @return: a chord
+ */
 function checkRange(chord){
     if (chord.notes()[0].octave() > 3 ){
        chord.transpose(teoria.interval('P-8'))
@@ -8,12 +12,17 @@ function checkRange(chord){
         chord.transpose(teoria.interval('P8'))
 
     }
-
     return chord
 }
 
+/**
+ * costFunction evaluates the cost of moving from a given chord and a candidate following one
+ * @param previous: the given chord, with a given voicing
+ * @param current: the candidate new chord
+ * @return {number}: the cost
+ */
 function costFunction(previous, current){
-    // already did checkRange on both
+    // already did checkRange on both so I assume they are in the same range
     let cost = 0;
     let interval;
     let spread;
@@ -23,13 +32,15 @@ function costFunction(previous, current){
 
     for ( let i = 0; i < current.notes().length; i++ ){
         for ( let j = 0; j < previous.notes().length; j++ ) {
+            // a measure of changing between successive chords
             interval = (teoria.interval(previous.notes()[j], current.notes()[i])).semitones();
             if ( i < 1 && j < 1 ){
-                interval = -interval*2;
+                interval = - Math.abs(interval)*2;
             }
             cost = cost + interval;
 
             if ( i < j ){
+                // penalize chords that have closer voices
                 if ( current.notes()[i] !== undefined && current.notes()[j] !== undefined) {
                     dist = teoria.interval(current.notes()[i], current.notes()[j]).semitones();
 
@@ -41,11 +52,14 @@ function costFunction(previous, current){
         }
     }
 
+
+    // range measures the distance between the lowest and the highest note of the voicing
     let range = (teoria.interval(current.notes()[0], current.notes()[current.notes().length-1])).semitones();
 
     //spreading coeff -> low spread means high penalty because of dissonance
     spread =  100 / (range * dist) ;
 
+    // additional penalization in order to avoid the movement from a well spread chord and a four-way close
     if ( cost < 0 ){
         cost = cost*(-10);
     }
@@ -53,6 +67,12 @@ function costFunction(previous, current){
     return cost + spread
 }
 
+/**
+ * drop executes the calculation of a voicing type of a chord
+ * @param chord: the chord to which calculate the new voicing
+ * @param type: the type of voicing to execute
+ * @return {*}: the new voiced version of the chord
+ */
 function drop(chord, type){
     let intervals;  //the voicings of the chord
     let newVoicing = [];
@@ -84,22 +104,48 @@ function drop(chord, type){
     return checkRange(chord);
 }
 
+/**
+ * noteOverChord evaluates if the given note is played over the chord
+ * @param note: the note, given as an object of pitch, startTime and endTime
+ * @param chordStart: initial timeStamp of the chord to evaluate
+ * @param chordEnd: final timestamp of the chord to evaluate
+ * @return {boolean}: true if the note is played over the chord
+ */
 function noteOverChord(note, chordStart, chordEnd){
     return (note.endTime >= chordStart && note.endTime < chordEnd)
         || ( note.startTime >= chordStart && note.startTime < chordEnd )
         || ( note.startTime < chordStart && note.endTime > chordEnd )
 }
 
+/**
+ * isCoreNote checks if the given note cannot be removed from the chord
+ * @param value: an interval corresponding to a note of the melody
+ * @return {boolean}: true if the note is respectively the 1, 3, 7, or 5 of the chord.
+ */
 function isCoreNote(value){
     let type = value[0];
     let degree = parseInt(value.substring(1)) % 7;
     return degree === 3 || degree === 7 || degree === 1 || (degree === 5 && type !== 'A');
 }
 
+/**
+ * longSustainedNotes evaluates if the a note from the melody is sustained for more than a quarter note
+ * @param melody: an array of notes (given as interval and duration) of the melody
+ * @param quarterNote: the quarter note duration in time in the song
+ * @return {*}: an array of non-core notes that are played over the chord
+ */
 function longSustainedNotes(melody, quarterNote){
     return (melody.filter( i => i.duration >= quarterNote && !isCoreNote(i.value) )).map( i => i.value);
 }
 
+/**
+ * createVoicing generates the voicing for a given chord
+ * @param curr: the chord over which executing the calculation
+ * @param prev: the previous chord of the progression (already voiced)
+ * @param melody: the melody played over the chord
+ * @param quarterNote: the quarter note duration in time
+ * @return {*}: a new voicing for the chord
+ */
 function createVoicing(curr, prev, melody, quarterNote){
     // get the voicing
     let currVoicing = curr.voicing().map( i => i.toString());
@@ -130,17 +176,16 @@ function createVoicing(curr, prev, melody, quarterNote){
     // compute the costs for each voicing
     cost = [];
 
-    cost.push(costFunction(prev, curr)+150); //four-way close
+    cost.push(costFunction(prev, curr)+150); //four-way close (highly penalized)
 
     for ( let i = 2; i < 5; i++ ){
         cost.push(costFunction(prev, drop(teoria.chord(curr.name), i))) //drop2, drop3 e drop24
     }
 
-
     minCost = Math.min(...cost);
     idx = cost.indexOf(minCost) + 1;
 
-    console.log('Chord: ', curr.name + ' ' + idx)
+    console.log('Chord: ', curr.name + ' ' + idx) //prints the selected voicing for a chord
 
     if ( idx > 1  ){
         newVoicing = drop(teoria.chord(curr.name), idx).voicing();
@@ -152,6 +197,11 @@ function createVoicing(curr, prev, melody, quarterNote){
     return newVoicing.map(i=>i.toString());
 }
 
+/**
+ * createProgression generates the voicing progression of a song, according to the melody (if given)
+ * @param song: the song to modify
+ * @param melodyNoteSequence: the melody played over the song (not necessary)
+ */
 function createProgression( song, melodyNoteSequence ){
     let currChord, prevChord;
     prevChord = song.Chart[0].chord;
