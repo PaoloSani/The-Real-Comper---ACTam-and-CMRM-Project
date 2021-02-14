@@ -1,1 +1,2 @@
-# ACTaM-Project
+# The Real Comper
+_The Real Comper_ is a web app which chooses chord voicing solutions given a melody and a chord progression. The system consists of two parts: an editor, in which the user can set the song parameters and write the chords and a visualizer in which the final voicing progression is retrieved. The voicing are generated  after a melody is recorded by the user over the written chord progression, via a midi device. The aim is to teach the user how to smartly create comping progression, which emphasize the melody and enrich the harmony content of the piece. 
