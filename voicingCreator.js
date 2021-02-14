@@ -17,7 +17,7 @@ function checkRange(chord){
 
 /**
  * costFunction evaluates the cost of moving from a given chord and a candidate following one
- * @param previous: the given chord, with a given voicing
+ * @param previous: the given chord previous chord of the progression (already voiced)
  * @param current: the candidate new chord
  * @return {number}: the cost
  */
