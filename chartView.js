@@ -103,15 +103,15 @@ song.Chart[0].chord='C6/9'
 song.Chart[1].chord='Am7'
 song.Chart[2].chord='Dm7'
 song.Chart[3].chord='G7'
-
-
 let songInfo = {};
+
 let chart = {};
 var songList = []
 // update those obj
 song.exportSongInfo(songInfo)
 song.exportSongChart(chart)
 var player = document.getElementById('midi-player1');
+player.noteSequence = chartToNoteSequence(songInfo, chart);
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////// MIDI RECORDING ///////////////////////////////////////////
@@ -151,9 +151,19 @@ function ChordEditor(props){
     }
 
     const initializeModal = () => {
-        let chord = props.chord;
-        let type = chord.slice(1)
-        chord = chord[0];
+        let toCut = props.chord;
+        let chord = toCut;
+        let type;
+
+        if ( chord.includes('b') || chord.includes('#') ){
+            chord = chord[0] + chord[1];
+            type = toCut.slice(2);
+        }
+        else {
+            chord = chord[0];
+            type = toCut.slice(1)
+        }
+
         setSelRoot(chord)
         if ( chord_type.includes(type) ){
             setSelType(type)
@@ -182,7 +192,12 @@ function ChordEditor(props){
                 takeInput.addEventListener("keyup", function (event) {
                     if (event.key === "Enter") {
                         const newInput = document.getElementById("custom-chord-input").value;
-                        setCustomSel(newInput)
+                        if ( !key_options.forEach(i => newInput.includes(i))){
+                            setCustomSel(selRoot+newInput)
+                        }
+                        else{
+                            setCustomSel(newInput)
+                        }
                     }
                 });
             }
@@ -190,15 +205,15 @@ function ChordEditor(props){
         }
     }
 
-    const printRootOptions = (content) => {
+    const printRootOptions = (content, index) => {
         return (
-            <div className={selRoot === content ? "meter-btn selected" : "meter-btn"} onClick={() =>handleClick(content, true)}>{content}</div>
+            <div key={'root'+index} className={selRoot === content ? "meter-btn selected" : "meter-btn"} onClick={() =>handleClick(content, true)}>{content}</div>
         )
     }
 
-    const printTypeOptions = (content) => {
+    const printTypeOptions = (content, index) => {
         return (
-            <div className={selType === content ? "meter-btn selected" : "meter-btn"} onClick={() => handleClick(content, false)}>{content}</div>
+            <div key={'type'+index} className={selType === content ? "meter-btn selected" : "meter-btn"} onClick={() => handleClick(content, false)}>{content}</div>
         )
     }
 
@@ -220,17 +235,17 @@ function ChordEditor(props){
 
     return(
         <>
-            <Modal isOpen={isOpen} style={customStyles} ariaHideApp={false} onAfterOpen={initializeModal} onRequestClose={closeModal} >
-                <button onClick={closeModal}>x</button>
-                <p>Note</p>
-                <div className={"mtr-cntr"}>
-                    {key_options.map((i) => printRootOptions(i))}
+            <Modal key={'editing-modal'} isOpen={isOpen} style={customStyles} ariaHideApp={false} onAfterOpen={initializeModal} onRequestClose={closeModal} >
+                <button key={'editing-modal button'}onClick={closeModal}>x</button>
+                <p key={'note-name'}>Note</p>
+                <div key={'meter-options'} className={"mtr-cntr"}>
+                    {key_options.map((i, index) => printRootOptions(i, index))}
                 </div>
-                <p>Chord Type</p>
-                <div className={"mtr-cntr"}>
-                    {chord_type.map((i) => printTypeOptions(i))}
+                <p key={'chord-type'}>Chord Type</p>
+                <div key={'chord-types'} className={"mtr-cntr"}>
+                    {chord_type.map((i, index) => printTypeOptions(i, index))}
                 </div>
-                <div id="custom-chord" style={{display: 'none'}}>
+                <div key={'enter-custom-chord'} id="custom-chord" style={{display: 'none'}}>
                     <label htmlFor="">Enter custom chord</label> <input id="custom-chord-input" type="text" /><br/>
                 </div>
             </Modal>
@@ -239,7 +254,7 @@ function ChordEditor(props){
 }
 
 /**
- * ChordBlock a single chord entity in the chart
+ * ChordBlock is a single chord entity in the chart
  */
 function ChordBlock(props){
 
@@ -270,11 +285,11 @@ function ChordBlock(props){
     }
 
     return (
-        <div key = {props.index} className={ className(props.index, props.slot, props.isPlaying)} onClick={show} >
-            <i className="icon-edit" onClick={editChord}/>
-            <div className={"chord"}>{props.name}</div>
+        <div key={'chord-num'+props.index} className={className(props.index, props.slot, props.isPlaying)} onClick={show} >
+            <i key={'icon' + props.index} className="far fa-edit icon-edit" onClick={editChord}/>
+            <div key={'name'+props.index} className={"chord"}>{props.name}</div>
             {props.name !== '%' && (
-                <div className={"degree"}>{props.degree}</div>
+                <div key={'degree'+props.index} className={"degree"}>{props.degree}</div>
             )}
         </div>
     )
@@ -325,13 +340,13 @@ function ChordChart(props){
 
     const printChord = (name, index, degree, midi) => {
         return (
-        <ChordBlock name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor} isPlaying={indexOfChordToPlay} showChord={setIndexToPlay}/>
+        <ChordBlock key={'chord-block'+index} name={name} index={index} slot={slotModel} degree={degree} midi={midi} openEditor={openEditor} isPlaying={indexOfChordToPlay} showChord={setIndexToPlay}/>
         )
     }
 
     const printLine = (lineIndex, namesPerLine, degreesPerLine, midiPerLine) =>{
         return (
-            <div id={"line" + lineIndex} className={"chart-line"}>
+            <div key={'line'+lineIndex} id={"line" + lineIndex} className={"chart-line"}>
                 {namesPerLine.map((i, index) => printChord(i, index + lineIndex*slotModel*4, degreesPerLine[index], midiPerLine[index]))}
             </div>
         )
@@ -373,6 +388,7 @@ function ChordChart(props){
                 song.modifyChord(newChord, indexOfChordToModify)
                 song.exportSongChart(chart)
                 updateStates()
+
             }
         }, [openModal, newChord]
     )
@@ -424,8 +440,8 @@ function ChordChart(props){
     }
 
     return (
-        <div id="chords">
-            <div className={"chart-editor"}>
+        <div key={'chords'} id="chords">
+            <div key={'chart-editor'} className={"chart-editor"}>
                 <button id="modify_chart" onClick={addBar}>
                     <i className="material-icons" >add</i>
                 </button>
@@ -433,8 +449,8 @@ function ChordChart(props){
                     <i className="material-icons" >remove</i>
                 </button>
             </div>
-            <ChordEditor isOpen={openModal} closeEditor={openEditor} chord={newChord}/>
-            <div id="chart">
+            <ChordEditor key={'chord-editor'} isOpen={openModal} closeEditor={openEditor} chord={newChord}/>
+            <div key={'chart'} id="chart">
                 {printChart(chartModel, chartDegree, midiNoteState, slotModel)}
             </div>
         </div>
@@ -498,16 +514,16 @@ function NewSongInfo(props) {
 
     return(
         <>
-            <Modal key={1} isOpen={isNewOpen} style={newModalStyle} onAfterOpen={openNew} ariaHideApp={false} onRequestClose={closeNew}>
-                <div>
-                    <span className="close" onClick={closeNew}>&times;</span>
-                    <div className="modal-header">
+            <Modal key={'modal-new-song'} isOpen={isNewOpen} style={newModalStyle} onAfterOpen={openNew} ariaHideApp={false} onRequestClose={closeNew}>
+                <div key={'div-new-song'}>
+                    <span key={'close-new-song'} className="close" onClick={closeNew}>&times;</span>
+                    <div key={'modal-header'} className="modal-header">
                          <p>Add Song parameters</p>
                      </div>
-                     <div className="modal-body">
-                         <div id="new-title">
+                     <div key={'modal-body'} className="modal-body">
+                         <div key={'new-title'} id="new-title">
                              <label>Song Title:
-                                 <input type="text" name="song-name" className="new-song-name" defaultValue={songInfo.title} onChange={showSongName}/>
+                                 <input key={'input-song-name'} type="text" name="song-name" className="new-song-name" defaultValue={songInfo.title} onChange={showSongName}/>
                              </label>
                          </div>
                          <div id="new-meter" className="new-params">
@@ -516,9 +532,9 @@ function NewSongInfo(props) {
                          <div>
                              {meters_options.map(
                                  (mtrs, ix) =>
-                                     <div className="mtr-cntr" key={mtrs.group} id={mtrs.group}>
-                                         { mtrs.signatures_set.map((vals) =>
-                                             <div className={(selMetGroup === ix && selMet === vals) ? "meter-btn selected" : "meter-btn"} onClick={() => handleMeter(ix, vals)}>{vals}</div>
+                                     <div key={'new-song-mtr'+ix} className="mtr-cntr" key={mtrs.group} id={mtrs.group}>
+                                         { mtrs.signatures_set.map((vals, index) =>
+                                             <div key={'mtr-btn'+index} className={(selMetGroup === ix && selMet === vals) ? "meter-btn selected" : "meter-btn"} onClick={() => handleMeter(ix, vals)}>{vals}</div>
                                          )}
                                      </div>
                              )}
@@ -535,8 +551,8 @@ function NewSongInfo(props) {
                              <p className="param-title">Key</p>
                          </div>
                          <div className="key-cntr">
-                             {key_options.map((key) =>
-                                 <div className={selKey.split(' ')[0] == key ? "meter-btn selected" : "meter-btn"} onClick={() => handleKey(key.split(' ')[0])}>{key.split(' ')[0]}</div>
+                             {key_options.map((key, index) =>
+                                 <div key={'key-cntr'+index} className={selKey.split(' ')[0] == key ? "meter-btn selected" : "meter-btn"} onClick={() => handleKey(key.split(' ')[0])}>{key.split(' ')[0]}</div>
                              )}
                          </div>
                      </div>
@@ -658,11 +674,9 @@ function Buttons(props) {
     }
 
     const stopRecording = () => {
-        var recordBtn = document.getElementById("record").style.color = "inherit";
         setRecording(false);
         midiRecorder.setRecording(false);
         midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
-        console.log(player.noteSequence)
     }
 
 
@@ -673,7 +687,6 @@ function Buttons(props) {
         } else if(id === "play") {
             props.startPlaying(true)
             player.start()
-            console.log(player.noteSequence)
         } else if(id === "generate") {
             props.generateVoicing(true);
 
@@ -775,7 +788,7 @@ function SongComponent(){
     const [title, setTitle] = useState( () => songInfo.title)
     const [meterType, setMeterType] = useState( () => songInfo.meterType)
     const [meter, setMeter] = useState( () => songInfo.meter)
-    const [bpm, setBpm] = useState(songInfo.bpm)
+    const [bpm, setBpm] = useState(() => songInfo.bpm)
     const [glob_tonality, setGlob_tonality] = useState( () => songInfo.glob_tonality)
     const [modalCaller, setModalCaller] = useState( () => false)
     const [modalNew, setModalNew] = useState(() => false)
@@ -817,30 +830,30 @@ function SongComponent(){
     }
 
     return(
-        <div id = "wrapper">
-            <h1>THE REAL COMPER</h1>
+        <div key={'wrapper'} id = "wrapper">
+            <h1 key={'title'}>THE REAL COMPER</h1>
             <div id="music-info">
-                <h2>{title}</h2>
-                <div id="mtrs-opts">
-                    <label>Meter:</label>
-                    <select id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
-                        {meterType.signatures_set.map((mtrs) =>
-                            <option value={mtrs}>{mtrs}</option>
+                <h2 key={'song-title'}>{title}</h2>
+                <div key={'meters-option'} id="mtrs-opts">
+                    <label key={'meter-title'}>Meter:</label>
+                    <select key={'select-meter'} id="meters" name="meters"  value={meter} onChange={showMeter}>
+                        {meterType.signatures_set.map((mtrs, index) =>
+                            <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
                         )}
                     </select>
                 </div>
                 <div>
-                    <label>Tempo:</label>
-                    <span id="music-note">
-                       ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" defaultValue={songInfo.bpm} value={bpm} onChange={showBPM}/>
+                    <label key={'tempo-title'}>Tempo:</label>
+                    <span key={'bpm-title'} id="music-note">
+                       ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220"  value={bpm} onChange={showBPM}/>
                    </span>
                 </div>
-                <div id="key-opts">
-                    <label id="key">Key:</label>
-                    <select id="keys" name="key" defaultValue={songInfo.glob_tonality} value={glob_tonality} onChange={showKey}>
+                <div key={'key-opts'} id="key-opts">
+                    <label key={'tonality-title'} id="key">Key:</label>
+                    <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
                         {key_options.map(
-                            (key) =>
-                                <option value={key}>{key}</option>
+                            (key, index) =>
+                                <option key={'option-tonality'+index} value={key}>{key}</option>
                         )}
                     </select>
                 </div>
@@ -853,10 +866,8 @@ function SongComponent(){
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
 
             <br/>
-            <ChordChart key={glob_tonality} newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying} newVoicing={newVoicing} setNewVoicing={setNewVoicing}/>
+            <ChordChart newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying} newVoicing={newVoicing} setNewVoicing={setNewVoicing}/>
             <br/>
-
-
 
         </div>
     )

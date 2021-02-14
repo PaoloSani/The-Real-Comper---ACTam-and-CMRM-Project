@@ -52,9 +52,9 @@ var midiRecorder = {
             }
         }
 
-        function onMIDISuccess(midiAccess) {
+        const onMIDISuccess = (midiAccess) =>  {
             var inputs = midiAccess.inputs.values();
-            for (var input of inputs) {
+            for (let input of inputs) {
                 this.inputName = input.name;
                 input.onmidimessage = onMIDIMessage; //sets up the MIDI listener
             }

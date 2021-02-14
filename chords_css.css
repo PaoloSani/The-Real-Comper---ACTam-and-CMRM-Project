@@ -85,10 +85,11 @@
     max-width: 100%;
 }
 
+
 .icon-edit {
-    color: #73767c;
+    color: #505050;
     font-size: 16px;
     position: absolute;
-    right: 10px;
+    right: 8px;
     top: 8px;
 }

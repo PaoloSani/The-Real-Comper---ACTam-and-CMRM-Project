@@ -99,6 +99,8 @@ function drop(chord, type){
         newVoicing.push(name+degree);
     }
 
+    console.log('Here problems: ',newVoicing)
+
     chord.voicing(newVoicing)
 
     return checkRange(chord);
@@ -151,12 +153,12 @@ function createVoicing(curr, prev, melody, quarterNote){
     let currVoicing = curr.voicing().map( i => i.toString());
     let newVoicing = teoria.chord(curr.name).voicing();
     let cost, minCost, idx;
-
+    console.log(curr)
     // remove notes / add notes according to the melody
     if ( currVoicing.length > 4 ){
         let idx = currVoicing.indexOf('P5')
-
         currVoicing.splice(idx, 1);
+
 
         if( currVoicing.length > 4 ){
             let noteToRemove = longSustainedNotes(melody, quarterNote);
@@ -172,6 +174,11 @@ function createVoicing(curr, prev, melody, quarterNote){
             }
         }
     }
+    curr.voicing(currVoicing)
+    console.log(currVoicing)
+
+    let toEdit = teoria.chord(curr.name);
+    toEdit.voicing(currVoicing)
 
     // compute the costs for each voicing
     cost = [];
@@ -179,7 +186,8 @@ function createVoicing(curr, prev, melody, quarterNote){
     cost.push(costFunction(prev, curr)+150); //four-way close (highly penalized)
 
     for ( let i = 2; i < 5; i++ ){
-        cost.push(costFunction(prev, drop(teoria.chord(curr.name), i))) //drop2, drop3 e drop24
+        cost.push(costFunction(prev, drop(toEdit, i))) //drop2, drop3 e drop24
+        toEdit.voicing(currVoicing)
     }
 
     minCost = Math.min(...cost);
@@ -187,12 +195,16 @@ function createVoicing(curr, prev, melody, quarterNote){
 
     console.log('Chord: ', curr.name + ' ' + idx) //prints the selected voicing for a chord
 
-    if ( idx > 1  ){
-        newVoicing = drop(teoria.chord(curr.name), idx).voicing();
-    }
+
     if ( curr === prev ){
-        newVoicing = drop(teoria.chord(curr.name), 4).voicing();
+        newVoicing = drop(toEdit, 4).voicing();
     }
+    else if ( idx > 1  ){
+        newVoicing = drop(toEdit, idx).voicing();
+    }
+
+
+    console.log(newVoicing.map(i=>i.toString()))
 
     return newVoicing.map(i=>i.toString());
 }
@@ -238,7 +250,6 @@ function createProgression( song, melodyNoteSequence ){
             );
 
             newVoicing = createVoicing(currChord, prevChord, intervals, quarterNote);
-            console.log(newVoicing)
 
             // apply the voicing to all chord from the last repetition
             for ( let j = repeat; j >= 0; j-- ){
