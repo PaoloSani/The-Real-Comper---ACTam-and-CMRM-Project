@@ -1,4 +1,5 @@
 import teoria from "teoria";
+import { beatsTimeStamp } from "./beatsTimeStamp";
 
 /**
  * checkRange transpose a chord in order to fit the best range of the keyboard
@@ -236,8 +237,10 @@ function createProgression( song, melodyNoteSequence ){
                 prevChord = song.Chart[i-repeat-1].chord;
             }
 
-            chordStart = (i-repeat)*quarterNote;
-            chordEnd = (i+1)*quarterNote;
+            // chordStart = (i-repeat)*quarterNote;
+            // chordEnd = (i+1)*quarterNote;
+            chordStart = beatsTimeStamp[i-repeat];
+            chordEnd = beatsTimeStamp[i+1];
 
             // take the intervals of the notes played over the chord with respect to the root
             root = currChord.root;

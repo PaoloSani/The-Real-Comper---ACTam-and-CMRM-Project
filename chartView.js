@@ -1,34 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+const teoria = require("teoria");
 const { useState, useEffect } = React
-import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
+import { db, Song, chordToNoteSequence, chartToNoteSequence, meters_options as possibleMeters} from "./index";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
+import {beatsTimeStamp} from "./beatsTimeStamp";
 
+var meters_options = possibleMeters ;
 
-const meters_options = [
-    {
-        group: 'Group A',
-        signatures_set: ['4/4', '17/16', '5/4'],
-        slot: 4,
-    },
-    {
-        group: 'Group B',
-        signatures_set: ['3/4', '7/8'],
-        slot: 3,
-    },
-    {
-        group: 'Group C',
-        signatures_set: ['5/4'],
-        slot: 5,
-    },
-    {
-        group: 'Group D',
-        signatures_set: ['7/4'],
-        slot: 7,
-    },
-]
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
     'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#','Bb', 'B'
@@ -103,8 +84,8 @@ song.Chart[0].chord='C6/9'
 song.Chart[1].chord='Am7'
 song.Chart[2].chord='Dm7'
 song.Chart[3].chord='G7'
-let songInfo = {};
 
+let songInfo = {};
 let chart = {};
 var songList = []
 // update those obj
@@ -372,6 +353,7 @@ function ChordChart(props){
     const startPlaying = () => {
         let i = 0;
         var t;
+        var timeStamp = beatsTimeStamp(songInfo, chart)
 
         var interval = setInterval(() => {
             if ( i === chartModel.length ){
@@ -380,6 +362,7 @@ function ChordChart(props){
             setIndexToPlay(i);
             i++;
         }, (1 / ( songInfo.bpm / 60 ))*1000);
+
     }
 
     useEffect(
@@ -693,6 +676,7 @@ function Buttons(props) {
 
         } else if(id === "stop") {
             props.startPlaying(false);
+            player.stop()
         } else if(id === "record") {
             if(!isRecording){
                 startRecording()
@@ -869,6 +853,8 @@ function SongComponent(){
             <br/>
             <ChordChart newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying} newVoicing={newVoicing} setNewVoicing={setNewVoicing}/>
             <br/>
+
+
 
         </div>
     )

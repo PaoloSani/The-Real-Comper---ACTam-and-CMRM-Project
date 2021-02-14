@@ -209,3 +209,28 @@ svg.waterfall-piano rect[original-fill="black"]:not(.active){
   position: absolute;
   display: none;
 }
+
+.songCollection {
+  font-size: 20px;
+  font-weight: bold;
+  font-family: monospace;
+  list-style-type: none;
+  text-align: center;
+  padding-bottom: 10px;
+  padding-top: 10px;
+}
+
+.songTitle {
+  list-style-type: none;
+  padding-left: 10px;
+}
+
+.songTitle::before {
+  content: "🎵";
+  margin-right: 0.6rem;
+}
+
+div.ReactModalPortal > :first-child {
+  height: 100vh;
+  overflow-y: scroll;
+}
