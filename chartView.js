@@ -7,8 +7,27 @@ import { db, Song, chordToNoteSequence, chartToNoteSequence } from "./index";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
 
+/* ---------- Import device images ---------- */
+var mAudio = require('./M-AudioKS.png')
+var artMini = require('./ArturiaMinilab.jpg')
+var pearlMallet = require('./PearlMalletstation.png')
 
+const devices = [
+    {
+        name: 'M-Audio Keystation MK3',
+        image: mAudio,
+    },
+    {
+        name: 'Arturia Minilab MKII',
+        image: artMini,
+    },
+    {
+        name: 'Pearl Malletstation',
+        image: pearlMallet,
+    }
+];
 
+/* ---------- Model/View Meter Options ---------- */
 const meters_options = [
     {
         group: 'Group A',
@@ -30,7 +49,7 @@ const meters_options = [
         signatures_set: ['7/4'],
         slot: 7,
     },
-]
+];
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
@@ -756,6 +775,17 @@ function PopupWindow() {
     }
 }
 
+function DeviceConn() {
+    var devName = midiRecorder.getInputName();
+    console.log(devName)
+
+    return(
+        <div>
+            <h3>{devName}</h3>
+            <img src={mAudio} alt="M-Audio Keystation"/>
+        </div>
+    )
+}
 
 function SongComponent(){
     const [title, setTitle] = useState( () => songInfo.title)
@@ -807,35 +837,38 @@ function SongComponent(){
     return(
         <div id = "wrapper">
             <h1>THE REAL COMPER</h1>
-            <div id="music-info">
-                <h2>{title}</h2>
-                <div id="mtrs-opts">
-                    <label>Meter:</label>
-                    <select id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
-                        {meterType.signatures_set.map((mtrs) =>
-                            <option value={mtrs}>{mtrs}</option>
-                        )}
-                    </select>
+            <div id="prova">
+                <div id="music-info">
+                    <h2>{title}</h2>
+                    <div id="mtrs-opts">
+                        <label>Meter:</label>
+                        <select id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
+                            {meterType.signatures_set.map((mtrs) =>
+                                <option value={mtrs}>{mtrs}</option>
+                            )}
+                        </select>
+                    </div>
+                    <div>
+                        <label>Tempo:</label>
+                        <span id="music-note">
+                        ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" defaultValue={songInfo.bpm} value={bpm} onChange={showBPM}/>
+                    </span>
+                    </div>
+                    <div id="key-opts">
+                        <label id="key">Key:</label>
+                        <select id="keys" name="key" defaultValue={songInfo.glob_tonality} value={glob_tonality} onChange={showKey}>
+                            {key_options.map(
+                                (key) =>
+                                    <option value={key}>{key}</option>
+                            )}
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label>Tempo:</label>
-                    <span id="music-note">
-                       ♩= <input type="number" id="bpm" name="bpm" min="60" max="220" defaultValue={songInfo.bpm} value={bpm} onChange={showBPM}/>
-                   </span>
-                </div>
-                <div id="key-opts">
-                    <label id="key">Key:</label>
-                    <select id="keys" name="key" defaultValue={songInfo.glob_tonality} value={glob_tonality} onChange={showKey}>
-                        {key_options.map(
-                            (key) =>
-                                <option value={key}>{key}</option>
-                        )}
-                    </select>
-                </div>
+
+                <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying}/>
+                
+                <DeviceConn/>
             </div>
-
-            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying}/>
-
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
