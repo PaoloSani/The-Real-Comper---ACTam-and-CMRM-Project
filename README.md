@@ -31,5 +31,5 @@ _The Real Comper_ is developed under to use of several libraries, here reported:
 
 - **React**: structure of the web page and of the View.
 - **Teoria.js**: a powerful music library for Javascript, including some very useful classes such as Note, Interval, Chord and Scale.
-- **Magenta.js**: a great library for music project. We used it for the genaration of the audio/midi file and for the visualization of the notes.
+- **Magenta.js**: a great library for music projects. We used it for the genaration of the audio/midi file and for the visualization of the notes.
 
