@@ -15,7 +15,51 @@ import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
 import {beatsTimeStamp} from "./beatsTimeStamp";
 
+/* ---------- Import device images ---------- */
+var mAudio = require('./M-AudioKS.png')
+var artMini = require('./ArturiaMinilab.jpg')
+var pearlMallet = require('./PearlMalletstation.png')
+
 var meters_options = possibleMeters ;
+
+const devices = [
+    {
+        name: 'M-Audio Keystation MK3',
+        image: mAudio,
+    },
+    {
+        name: 'Arturia Minilab MKII',
+        image: artMini,
+    },
+    {
+        name: 'Pearl Malletstation',
+        image: pearlMallet,
+    }
+];
+
+/* ---------- Model/View Meter Options ---------- */
+const meters_options = [
+    {
+        group: 'Group A',
+        signatures_set: ['4/4', '17/16', '5/4'],
+        slot: 4,
+    },
+    {
+        group: 'Group B',
+        signatures_set: ['3/4', '7/8'],
+        slot: 3,
+    },
+    {
+        group: 'Group C',
+        signatures_set: ['5/4'],
+        slot: 5,
+    },
+    {
+        group: 'Group D',
+        signatures_set: ['7/4'],
+        slot: 7,
+    },
+];
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
@@ -730,45 +774,20 @@ function Buttons(props) {
 
 
 
-//TODO: delete?
-/* ---------- Open file function ---------- */
-function OpenFile() {
-    const real_btn = document.getElementById("a-file");
-    const folder_btn = document.getElementById("folder-btn");
 
-    folder_btn.EventListener("click", function() {
-        real_btn.click();
-    });
+/**
+ * Show connected MIDI device
+ */
+function DeviceConn() {
+    var devName = midiRecorder.getInputName();
+    console.log(devName)
 
-    real_btn.addEventListener("change", function() {
-        const mid_val = real_btn.value;
-    });
-}
-
-
-//TODO: delete?
-/* ---------- Popup window ---------- */
-function PopupWindow() {
-    // Get the modal
-    var modal = document.getElementById("myModal");
-    // Get the button that opens the modal
-    var add_btn = document.getElementById("new");
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
-    // When the user clicks the button, open the modal
-    add_btn.onclick = function () {
-        modal.style.display = "block";
-    }
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function () {
-        modal.style.display = "none";
-    }
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function (event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
+    return(
+        <div>
+            <h3>{devName}</h3>
+            <img src={mAudio} alt="M-Audio Keystation"/>
+        </div>
+    )
 }
 
 /**
@@ -822,32 +841,33 @@ function SongComponent(){
     return(
         <div key={'wrapper'} id = "wrapper">
             <h1 key={'title'}>THE REAL COMPER</h1>
-            <div id="music-info">
-                <h2 key={'song-title'}>{title}</h2>
-                <div key={'meters-option'} id="mtrs-opts">
-                    <label key={'meter-title'}>Meter:</label>
-                    <select key={'select-meter'} id="meters" name="meters"  value={meter} onChange={showMeter}>
-                        {meterType.signatures_set.map((mtrs, index) =>
-                            <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
-                        )}
-                    </select>
+            <div id="prova">
+                <div id="music-info">
+                    <h2 key={'song-title'}>{title}</h2>
+                    <div key={'meters-option'} id="mtrs-opts">
+                        <label key={'meter-title'}>Meter:</label>
+                        <select key={'select-meter'} id="meters" name="meters"  value={meter} onChange={showMeter}>
+                            {meterType.signatures_set.map((mtrs, index) =>
+                                <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
+                            )}
+                        </select>
+                    </div>
+                    <div>
+                        <label key={'tempo-title'}>Tempo:</label>
+                        <span key={'bpm-title'} id="music-note">
+                           ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220"  value={bpm} onChange={showBPM}/>
+                       </span>
+                    </div>
+                    <div key={'key-opts'} id="key-opts">
+                        <label key={'tonality-title'} id="key">Key:</label>
+                        <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
+                            {key_options.map(
+                                (key, index) =>
+                                    <option key={'option-tonality'+index} value={key}>{key}</option>
+                            )}
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label key={'tempo-title'}>Tempo:</label>
-                    <span key={'bpm-title'} id="music-note">
-                       ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220"  value={bpm} onChange={showBPM}/>
-                   </span>
-                </div>
-                <div key={'key-opts'} id="key-opts">
-                    <label key={'tonality-title'} id="key">Key:</label>
-                    <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
-                        {key_options.map(
-                            (key, index) =>
-                                <option key={'option-tonality'+index} value={key}>{key}</option>
-                        )}
-                    </select>
-                </div>
-            </div>
 
             <div id="control-buttons">
                 {bank.map(
@@ -855,6 +875,9 @@ function SongComponent(){
                         <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
                 )}
             </div>
+
+            <DeviceConn/>
+        </div>
 
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
