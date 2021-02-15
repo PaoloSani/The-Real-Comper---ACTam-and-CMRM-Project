@@ -10,17 +10,26 @@ import {createProgression} from "./voicingCreator";
 var mAudio = require('./M-AudioKS.png')
 var artMini = require('./ArturiaMinilab.jpg')
 var pearlMallet = require('./PearlMalletstation.png')
+var defIm = require('./defIm.jpeg')
 
 const devices = [
     {
+        manufacturer: 'default',
+        name: 'default',
+        image: defIm,
+    },
+    {
+        manufacturer: 'M-Audio',
         name: 'M-Audio Keystation MK3',
         image: mAudio,
     },
     {
+        manufacturer: 'Arturia',
         name: 'Arturia Minilab MKII',
         image: artMini,
     },
     {
+        manufacturer: 'Pearl',
         name: 'Pearl Malletstation',
         image: pearlMallet,
     }
@@ -48,12 +57,8 @@ const meters_options = [
         signatures_set: ['7/4'],
         slot: 7,
     },
-<<<<<<< HEAD
-]
-=======
 ];
 
->>>>>>> adding devices images
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
     'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#','Bb', 'B'
@@ -808,13 +813,42 @@ function PopupWindow() {
 }
 
 function DeviceConn() {
-    var devName = midiRecorder.getInputName();
-    console.log(devName)
+    const [imName, setImName] = useState(() => midiRecorder.getInputName().split(' ')[0])
+    const [imSource, setImSource] = useState(() => devices[0].image)
+
+    useEffect(
+        () => {
+            if(imName != midiRecorder.getInputName().split(' ')[0]) {
+                devices.forEach(dev => 
+                    {if(dev.manufacturer === midiRecorder.getInputName().split(' ')[0]) {
+                        setImName([dev.name])
+                        setImSource([dev.image.toString()])
+                    }})
+            }
+        }, []
+    )
+
+    // useEffect(
+    //     () => {
+    //         devices.forEach(dev => {if(dev.manufacturer === imName) {setImSource([dev.image.toString()])} })
+    //         console.log(imName)
+    //     }, [imName]
+    // )
+
+    // const setImage = () => {
+    //     var imDev = defIm
+    //     for(let dev in devices){
+    //         if(dev.manufacturer === imName){
+    //             imDev = dev.image
+    //         }
+    //     }
+    //     return(imDev)
+    // }
 
     return(
         <div>
-            <h3>{devName}</h3>
-            <img src={mAudio} alt="M-Audio Keystation"/>
+            <h3>{imName}</h3>
+            <img src={imSource} width="300" height="200"/>
         </div>
     )
 }
