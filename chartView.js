@@ -6,7 +6,27 @@ import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
 
+/* ---------- Import device images ---------- */
+var mAudio = require('./M-AudioKS.png')
+var artMini = require('./ArturiaMinilab.jpg')
+var pearlMallet = require('./PearlMalletstation.png')
 
+const devices = [
+    {
+        name: 'M-Audio Keystation MK3',
+        image: mAudio,
+    },
+    {
+        name: 'Arturia Minilab MKII',
+        image: artMini,
+    },
+    {
+        name: 'Pearl Malletstation',
+        image: pearlMallet,
+    }
+];
+
+/* ---------- Model/View Meter Options ---------- */
 const meters_options = [
     {
         group: 'Group A',
@@ -28,7 +48,12 @@ const meters_options = [
         signatures_set: ['7/4'],
         slot: 7,
     },
+<<<<<<< HEAD
 ]
+=======
+];
+
+>>>>>>> adding devices images
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
     'C', 'C#', 'Db', 'D', 'D#', 'Eb', 'E', 'F', 'F#', 'Gb', 'G', 'G#', 'Ab', 'A', 'A#','Bb', 'B'
@@ -782,6 +807,18 @@ function PopupWindow() {
     }
 }
 
+function DeviceConn() {
+    var devName = midiRecorder.getInputName();
+    console.log(devName)
+
+    return(
+        <div>
+            <h3>{devName}</h3>
+            <img src={mAudio} alt="M-Audio Keystation"/>
+        </div>
+    )
+}
+
 /**
  * SongComponent is the general React component for the app, it manages the general info of the song and act a Parent component for communicating children
  */
@@ -833,35 +870,38 @@ function SongComponent(){
     return(
         <div key={'wrapper'} id = "wrapper">
             <h1 key={'title'}>THE REAL COMPER</h1>
-            <div id="music-info">
-                <h2 key={'song-title'}>{title}</h2>
-                <div key={'meters-option'} id="mtrs-opts">
-                    <label key={'meter-title'}>Meter:</label>
-                    <select key={'select-meter'} id="meters" name="meters"  value={meter} onChange={showMeter}>
-                        {meterType.signatures_set.map((mtrs, index) =>
-                            <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
-                        )}
-                    </select>
+            <div id="prova">
+                <div id="music-info">
+                    <h2 key={'song-title'}>{title}</h2>
+                    <div key={'meters-option'} id="mtrs-opts">
+                        <label key={'meter-title'}>Meter:</label>
+                        <select key={'select-meter'} id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
+                            {meterType.signatures_set.map((mtrs, index) =>
+                                <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
+                            )}
+                        </select>
+                    </div>
+                    <div>
+                        <label key={'tempo-title'}>Tempo:</label>
+                        <span key={'bpm-title'} id="music-note">
+                        ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220" value={bpm} onChange={showBPM}/>
+                    </span>
+                    </div>
+                    <div key={'key-opts'} id="key-opts">
+                        <label key={'tonality-title'} id="key">Key:</label>
+                        <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
+                            {key_options.map(
+                                (key, index) =>
+                                    <option key={'option-tonality'+index} value={key}>{key}</option>
+                            )}
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label key={'tempo-title'}>Tempo:</label>
-                    <span key={'bpm-title'} id="music-note">
-                       ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220"  value={bpm} onChange={showBPM}/>
-                   </span>
-                </div>
-                <div key={'key-opts'} id="key-opts">
-                    <label key={'tonality-title'} id="key">Key:</label>
-                    <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
-                        {key_options.map(
-                            (key, index) =>
-                                <option key={'option-tonality'+index} value={key}>{key}</option>
-                        )}
-                    </select>
-                </div>
+
+                <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying}/>
+                
+                <DeviceConn/>
             </div>
-
-            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying} generateVoicing={setNewVoicing}/>
-
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
