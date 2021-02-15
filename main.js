@@ -700,6 +700,7 @@ function Buttons(props) {
             if (props.metronome){
                 props.setMetronome(false)
                 player.noteSequence = chartToNoteSequence(songInfo, chart);
+                midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
             }
             else{
                 props.setMetronome(true);
