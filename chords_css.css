@@ -59,7 +59,7 @@
 }
 
 .chord-selected {
-    background: #91b942;
+    background: rgb(255 145 0);
 }
 
 .chord-block.right {
@@ -79,7 +79,7 @@
 
 .chart-line{
     padding-right: 0px;
-    padding-left: 0px;
+    padding-left: 10px;
     display: inline-flex;
     width: fit-content;
     max-width: 100%;

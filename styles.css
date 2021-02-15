@@ -17,18 +17,22 @@ body::-webkit-scrollbar {
   display: none;
 }
 
+div#prova {
+  display: flex;
+  position: relative;
+  margin: auto;
+  width: 100%;
+}
 
 #ctrl-btns div:not(.name) {
   display: inline-block;
 }
 
 h1 {
-  padding-top: 3px;
   text-align: center;
   width: 100%;
   font-family: 'Baby Kruffy', arial;
   font-size: 50px;
-  margin-top: 5%;
   margin-bottom: 0;
   text-transform: capitalize;
 }
@@ -87,8 +91,8 @@ select:hover {
 
 #keys {
   position: relative;
-  left: 10%;
-  width: 6vw;
+  left: 13%;
+  width: 4vw;
   background-color: transparent;
 }
 
@@ -135,9 +139,9 @@ select:hover {
 }
 
 #control-buttons {
-  position: relative;
+  position: absolute;
   width: fit-content;
-  height: 7vh;
+  height: fit-content;
   margin: auto;
   vertical-align: middle;
   padding: 5px;
@@ -145,7 +149,9 @@ select:hover {
   color: #000;
   border-radius: 5px;
   display: -webkit-box;
-  /*margin-top: 3vh;*/
+  margin-top: 8vh;
+  left: 50%;
+  transform: translateX(-50%);
   background-color: #dea04f;
 }
 
@@ -169,6 +175,18 @@ select:hover {
   top: 5px;
   font-size: 14px;
   display: table;
+}
+
+h3 {
+  width: 100%;
+  margin-left: 70%;
+  font-family: monospace;
+  font-size: 18px;
+}
+img {
+  margin-left: 70%;
+  width: 25%;
+  height: auto;
 }
 
 #chords {

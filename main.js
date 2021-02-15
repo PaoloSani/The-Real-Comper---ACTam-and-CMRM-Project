@@ -15,7 +15,35 @@ import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
 import {beatsTimeStamp} from "./beatsTimeStamp";
 
+/* ---------- Import device images ---------- */
+var mAudio = require('./M-AudioKS.png')
+var artMini = require('./ArturiaMinilab.jpg')
+var pearlMallet = require('./PearlMalletstation.png')
+var defIm = require('./defIm.jpeg')
+
 var meters_options = possibleMeters ;
+const devices = [
+    {
+        manufacturer: 'default',
+        name: 'default',
+        image: defIm,
+    },
+    {
+        manufacturer: 'M-Audio',
+        name: 'M-Audio Keystation MK3',
+        image: mAudio,
+    },
+    {
+        manufacturer: 'Arturia',
+        name: 'Arturia Minilab MKII',
+        image: artMini,
+    },
+    {
+        manufacturer: 'Pearl',
+        name: 'Pearl Malletstation',
+        image: pearlMallet,
+    }
+];
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
@@ -771,6 +799,47 @@ function PopupWindow() {
     }
 }
 
+function DeviceConn() {
+    const [imName, setImName] = useState(() => midiRecorder.getInputName().split(' ')[0])
+    const [imSource, setImSource] = useState(() => devices[0].image)
+
+    useEffect(
+        () => {
+            if(imName != midiRecorder.getInputName().split(' ')[0]) {
+                devices.forEach(dev =>
+                    {if(dev.manufacturer === midiRecorder.getInputName().split(' ')[0]) {
+                        setImName([dev.name])
+                        setImSource([dev.image.toString()])
+                    }})
+            }
+        }, []
+    )
+
+    // useEffect(
+    //     () => {
+    //         devices.forEach(dev => {if(dev.manufacturer === imName) {setImSource([dev.image.toString()])} })
+    //         console.log(imName)
+    //     }, [imName]
+    // )
+
+    // const setImage = () => {
+    //     var imDev = defIm
+    //     for(let dev in devices){
+    //         if(dev.manufacturer === imName){
+    //             imDev = dev.image
+    //         }
+    //     }
+    //     return(imDev)
+    // }
+
+    return(
+        <div>
+            <h3>{imName}</h3>
+            <img src={imSource} width="300" height="200"/>
+        </div>
+    )
+}
+
 /**
  * SongComponent is the general React component for the app, it manages the general info of the song and act a Parent component for communicating children
  */
@@ -822,40 +891,42 @@ function SongComponent(){
     return(
         <div key={'wrapper'} id = "wrapper">
             <h1 key={'title'}>THE REAL COMPER</h1>
-            <div id="music-info">
-                <h2 key={'song-title'}>{title}</h2>
-                <div key={'meters-option'} id="mtrs-opts">
-                    <label key={'meter-title'}>Meter:</label>
-                    <select key={'select-meter'} id="meters" name="meters"  value={meter} onChange={showMeter}>
-                        {meterType.signatures_set.map((mtrs, index) =>
-                            <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
-                        )}
-                    </select>
+            <div id="prova">
+                <div id="music-info">
+                    <h2 key={'song-title'}>{title}</h2>
+                    <div key={'meters-option'} id="mtrs-opts">
+                        <label key={'meter-title'}>Meter:</label>
+                        <select key={'select-meter'} id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
+                            {meterType.signatures_set.map((mtrs, index) =>
+                                <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
+                            )}
+                        </select>
+                    </div>
+                    <div>
+                        <label key={'tempo-title'}>Tempo:</label>
+                        <span key={'bpm-title'} id="music-note">
+                        ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220" value={bpm} onChange={showBPM}/>
+                    </span>
+                    </div>
+                    <div key={'key-opts'} id="key-opts">
+                        <label key={'tonality-title'} id="key">Key:</label>
+                        <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
+                            {key_options.map(
+                                (key, index) =>
+                                    <option key={'option-tonality'+index} value={key}>{key}</option>
+                            )}
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label key={'tempo-title'}>Tempo:</label>
-                    <span key={'bpm-title'} id="music-note">
-                       ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220"  value={bpm} onChange={showBPM}/>
-                   </span>
-                </div>
-                <div key={'key-opts'} id="key-opts">
-                    <label key={'tonality-title'} id="key">Key:</label>
-                    <select key={'change-tonality'} id="keys" name="key" value={glob_tonality} onChange={showKey}>
-                        {key_options.map(
-                            (key, index) =>
-                                <option key={'option-tonality'+index} value={key}>{key}</option>
-                        )}
-                    </select>
-                </div>
-            </div>
 
-            <div id="control-buttons">
-                {bank.map(
-                    (btn, index) =>
-                        <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
-                )}
+                <div id="control-buttons">
+                    {bank.map(
+                        (btn, index) =>
+                            <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
+                    )}
+                </div>
+                <DeviceConn/>
             </div>
-
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
