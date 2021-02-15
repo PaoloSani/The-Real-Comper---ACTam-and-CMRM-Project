@@ -285,6 +285,10 @@ function ChordBlock(props){
         // Tone.Transport.clear()
         Tone.Transport.stop()
         player.start()
+        setTimeout(function () {
+            player.noteSequence = chartToNoteSequence(songInfo, chart);
+            midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
+        }, 3000);
     }
 
     return (
