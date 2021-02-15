@@ -205,6 +205,10 @@ svg.waterfall-piano rect[original-fill="black"]:not(.active){
   fill: url(#keyGradient);
 }
 
+midi-visualizer svg rect.note[data-is-drum="true"]{
+  opacity: 0;
+}
+
 #midi-player1{
   position: absolute;
   display: none;

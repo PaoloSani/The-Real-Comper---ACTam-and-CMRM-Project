@@ -2,7 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 const teoria = require("teoria");
 const { useState, useEffect } = React
-import { db, Song, chordToNoteSequence, chartToNoteSequence, meters_options as possibleMeters} from "./index";
+import {
+    db,
+    Song,
+    chordToNoteSequence,
+    chartToNoteSequence,
+    meters_options as possibleMeters,
+    getMetronome
+} from "./songModel";
 import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
@@ -36,11 +43,7 @@ const bank = [{
     id: 'generate',
     icon: 'piano',
     name: 'Generate'
-}, {
-    id: 'repeat',
-    icon: 'repeat',
-    name: 'Repeat'
-}, {
+},  {
     id: 'save',
     icon: 'save',
     name: 'Save'
@@ -48,6 +51,11 @@ const bank = [{
     id: 'open',
     icon: 'folder',
     name: 'Open'
+}, {
+        id: 'metronome',
+        on: 'music_note',
+        off: 'music_off',
+        name: 'Metronome'
 }];
 
 const chord_type = ['ma', 'm', '7', 'm7', 'maj7', 'dim', 'sus2', 'sus4', 'aug', '%', 'custom']
@@ -169,18 +177,32 @@ function ChordEditor(props){
         else {
             setSelType(content)
             if ( content === 'custom' ) {
-                takeInput.style.display = "block";
-                takeInput.addEventListener("keyup", function (event) {
-                    if (event.key === "Enter") {
-                        const newInput = document.getElementById("custom-chord-input").value;
-                        if ( !key_options.forEach(i => newInput.includes(i))){
-                            setCustomSel(selRoot+newInput)
-                        }
-                        else{
-                            setCustomSel(newInput)
-                        }
-                    }
-                });
+
+                    takeInput.style.display = "block";
+                    takeInput.addEventListener("keyup", function (event) {
+                        let newChord ;
+                        if (event.key === "Enter") {
+                               const newInput = document.getElementById("custom-chord-input").value;
+                                if (!key_options.forEach(i => newInput.includes(i))) {
+                                    newChord = selRoot + newInput
+                                } else {
+                                    newChord = newInput
+                                }
+
+                                try {
+                                    teoria.chord(newChord)
+                                    setCustomSel(newChord)
+
+                                } catch (TypeError) {
+                                    document.getElementById("custom-chord-input").value = 'invalid chord';
+                                    console.log('catch')
+                                }
+
+                            }
+
+                    });
+
+
             }
 
         }
@@ -299,6 +321,7 @@ function ChordChart(props){
     )
 
     const updateStates = () => {
+        props.setMetronome(false)
         setChartModel([...chart.chartModel])
         setChartDegree([...chart.chartDegree])
         setSlotModel(chart.slotModel)
@@ -350,20 +373,6 @@ function ChordChart(props){
         return arr.map( (i, index)=> printLine(index, namesPerLine[index], degreesPerLine[index], midiPerLine[index]))
     }
 
-    const startPlaying = () => {
-        let i = 0;
-        var t;
-        var timeStamp = beatsTimeStamp(songInfo, chart)
-
-        var interval = setInterval(() => {
-            if ( i === chartModel.length ){
-                clearInterval(interval);
-            }
-            setIndexToPlay(i);
-            i++;
-        }, (1 / ( songInfo.bpm / 60 ))*1000);
-
-    }
 
     useEffect(
         () =>{
@@ -376,17 +385,7 @@ function ChordChart(props){
         }, [openModal, newChord]
     )
 
-    useEffect(
-        () =>{
-            if ( props.isPlaying ){
-                startPlaying()
-                props.stopPlaying(false)
-            }
-            else {
-                setIndexToPlay(chartModel.length+1);
-            }
-        }, [props.isPlaying]
-    )
+
 
     useEffect(
         () =>{
@@ -669,13 +668,16 @@ function Buttons(props) {
         if(id === "new") {
             props.openNew(true)
         } else if(id === "play") {
-            props.startPlaying(true)
-            player.start()
+            try {
+                player.start()
+            }
+            catch (Error) {
+                console.log('Wait for the buffer to start!')
+            }
         } else if(id === "generate") {
             props.generateVoicing(true);
 
         } else if(id === "stop") {
-            props.startPlaying(false);
             player.stop()
         } else if(id === "record") {
             if(!isRecording){
@@ -690,6 +692,17 @@ function Buttons(props) {
             props.openModal(true)
             // OpenFile()
         }
+        else if(id === "metronome") {
+            if (props.metronome){
+                props.setMetronome(false)
+                player.noteSequence = chartToNoteSequence(songInfo, chart);
+            }
+            else{
+                props.setMetronome(true);
+                getMetronome(songInfo, chart).notes.forEach(i=>player.noteSequence.notes.push(i));
+            }
+        }
+
     }
 
     return(
@@ -700,8 +713,8 @@ function Buttons(props) {
             <div key={props.btn.id} id={props.btn.id} className="button" onClick={() => Actions(props.btn.id)}>
                 { props.btn.id === "open" ?
                     <i className="material-icons" id="folder-btn">{props.btn.icon}</i> :
-                    (props.btn.id == "record" ? <i className="material-icons record" id="folder-btn">{props.btn.icon}</i> :
-                    <i className="material-icons">{props.btn.icon}</i>
+                    (props.btn.id === "record" ? <i className="material-icons record" id="folder-btn">{props.btn.icon}</i> :
+                    <i className="material-icons">{props.btn.id === 'metronome' ? ( props.metronome ? props.btn.on : props.btn.off ) :props.btn.icon}</i>
                     )
                 }
                 <div className="name">{props.btn.name}</div>
@@ -710,19 +723,6 @@ function Buttons(props) {
     )
 }
 
-
-// TODO: collapse it into buttons?
-function Ctrls(props) {
-
-    return(
-        <div id="control-buttons">
-            {bank.map(
-                (btn, index) =>
-                    <Buttons key={index} btn={btn} openModal={props.setModalCaller} openNew={props.setModalNew} startPlaying={props.startPlaying} generateVoicing={props.generateVoicing}/>
-            )}
-        </div>
-    );
-}
 
 
 //TODO: delete?
@@ -778,8 +778,8 @@ function SongComponent(){
     const [modalCaller, setModalCaller] = useState( () => false)
     const [modalNew, setModalNew] = useState(() => false)
     const [newSongLoading, setNewSongLoading] = useState(() => false)
-    const [isPlaying, setIsPlaying] = useState(() => false)
     const [newVoicing, setNewVoicing] = useState(() => false)
+    const [metronome, setMetronome] = useState(() => false)
 
     useEffect(
         () =>{
@@ -844,14 +844,19 @@ function SongComponent(){
                 </div>
             </div>
 
-            <Ctrls setModalCaller={setModalCaller} setModalNew={setModalNew} startPlaying={setIsPlaying} generateVoicing={setNewVoicing}/>
+            <div id="control-buttons">
+                {bank.map(
+                    (btn, index) =>
+                        <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
+                )}
+            </div>
 
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
 
             <br/>
-            <ChordChart newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} isPlaying={isPlaying} stopPlaying={setIsPlaying} newVoicing={newVoicing} setNewVoicing={setNewVoicing}/>
+            <ChordChart newSongLoading={newSongLoading} setNewSongLoading={setNewSongLoading} newVoicing={newVoicing} setNewVoicing={setNewVoicing} setMetronome={setMetronome}/>
             <br/>
 
 

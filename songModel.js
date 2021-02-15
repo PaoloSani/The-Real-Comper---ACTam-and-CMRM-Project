@@ -59,6 +59,7 @@ const meters_options = [
     },
 ]
 
+
 class Chord {
 
     constructor(chord, tonality) {
@@ -93,7 +94,9 @@ class Chord {
     }
 }
 
-
+/**
+ * Model class of the project. It holds multiple song attributes and has methods to transform this model into a lightweight model for the View
+ */
 class Song{
     constructor(title, meter, bpm, tonality, meterIndex) {
         // this.meter = meterToIntArray(meter || meters_options[0].signatures_set[0]);
@@ -153,16 +156,6 @@ class Song{
         return this._tonality;
     }
 
-    transposeSong(newTonality){
-        var interval = this.glob_tonality.tonic.interval(teoria.note(newTonality));
-
-        for ( let i = 0; i < this.Chart.length; i++){
-            var chord = this.Chart[i].chord.transpose(interval);
-            this.Chart[i].chord = chord;
-        }
-        this.glob_tonality = newTonality + ' major';
-    }
-
     get meter(){
         return this._meter;
     }
@@ -175,6 +168,28 @@ class Song{
         return this._title;
     }
 
+    modifyChord(chord, index){
+        this._chart[index].chord = chord;
+    }
+
+    /**
+     * Automatically transpose the song in a new tonality
+     * @param newTonality: the target new tonality
+     */
+    transposeSong(newTonality){
+        let interval = this.glob_tonality.tonic.interval(teoria.note(newTonality));
+
+        for ( let i = 0; i < this.Chart.length; i++){
+            let chord = this.Chart[i].chord.transpose(interval);
+            this.Chart[i].chord = chord;
+        }
+        this.glob_tonality = newTonality + ' major';
+    }
+
+    /**
+     * Update a light version of the song attributes
+     * @param songInfo: the object to update
+     */
     exportSongInfo(songInfo) {
         // updating songInfo properties
         songInfo.title = this.title
@@ -185,6 +200,10 @@ class Song{
         songInfo.glob_tonality = this.glob_tonality.tonic.name().toUpperCase() + this.glob_tonality.tonic.accidental() + ' ' + this.glob_tonality.name
     }
 
+    /**
+     * Update a light version of the chart
+     * @param chartObject: the object to update
+     */
     exportSongChart(chartObject){
         // updating chartObject properties
         chartObject.chartModel = this.Chart.map( (i, index) => {
@@ -218,10 +237,6 @@ class Song{
 
     }
 
-    modifyChord(chord, index){
-        this._chart[index].chord = chord;
-    }
-
     /**
      * Saves current song to firebase
      * @param collectionName: location folder in which the file must be saved
@@ -236,7 +251,7 @@ class Song{
     }
 
     /**
-     *
+     * Load a song from Firebase
      * @param songTitle: name of the song
      * @param collectionName: collection in which the title must be searched
      * @return {*}: a Song instance
@@ -254,7 +269,7 @@ class Song{
 
     /**
      *
-      * @param parsedSong: Object
+     * @param parsedSong: Object
      * @return {Song}: a song instance
      */
     static parseSong(parsedSong){
@@ -287,7 +302,6 @@ class Song{
     /**
      *  @param collectionName: songs or presets
      */
-
     static getSongList(collectionName){
 
         collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
@@ -299,10 +313,19 @@ class Song{
             // })
     }
 
+    getMetronome(){
 
+    }
 
 }
 
+/**
+ * Export a noteSequence of the chord
+ * @param midiChord: the notes of the chord
+ * @param start: the initial timeStamp of the chord
+ * @param end: the final timeStamp of the chord
+ * @return {{notes: [], totalTime: *}}: a noteSequence object
+ */
 function chordToNoteSequence(midiChord, start, end){
 
     var chordNoteSequence = {
@@ -317,8 +340,13 @@ function chordToNoteSequence(midiChord, start, end){
     return chordNoteSequence
 }
 
+/**
+ * Export a noteSequece version of the chart
+ * @param songInfo: the parameters of the song
+ * @param chart: the chart of the song
+ * @return {{notes: [], totalTime: number}}: the final noteSequence generated
+ */
 function chartToNoteSequence(songInfo, chart){
-
     var chartNoteSequence = {
         notes: [],
         totalTime: 0
@@ -361,4 +389,30 @@ function chartToNoteSequence(songInfo, chart){
     return chartNoteSequence;
 }
 
-export { db, Song, chordToNoteSequence, chartToNoteSequence , meters_options }
+function getMetronome(songInfo, chart) {
+    var metronomeNoteSequence = {
+        notes: [],
+        totalTime: 0
+    }
+
+    // var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
+    var noteTimeStamp = beatsTimeStamp(songInfo, chart)
+
+
+    for (let i = 0; i < chart.MIDInote.length; i++ ){
+        if( i % songInfo.meterType.slot === 0){
+            metronomeNoteSequence.notes.push({pitch: 80, startTime: noteTimeStamp[i], endTime: noteTimeStamp[i+1], isDrum: true})
+        }
+        else{
+            metronomeNoteSequence.notes.push({pitch: 81, startTime: noteTimeStamp[i], endTime: noteTimeStamp[i+1], isDrum: true})
+        }
+    }
+
+
+
+    metronomeNoteSequence.totalTime = noteTimeStamp[noteTimeStamp.length-1];
+
+    return metronomeNoteSequence;
+}
+
+export { db, Song, chordToNoteSequence, chartToNoteSequence, getMetronome , meters_options }
