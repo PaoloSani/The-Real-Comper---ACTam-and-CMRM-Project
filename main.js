@@ -38,28 +38,6 @@ const devices = [
 ];
 
 /* ---------- Model/View Meter Options ---------- */
-const meters_options = [
-    {
-        group: 'Group A',
-        signatures_set: ['4/4', '17/16', '5/4'],
-        slot: 4,
-    },
-    {
-        group: 'Group B',
-        signatures_set: ['3/4', '7/8'],
-        slot: 3,
-    },
-    {
-        group: 'Group C',
-        signatures_set: ['5/4'],
-        slot: 5,
-    },
-    {
-        group: 'Group D',
-        signatures_set: ['7/4'],
-        slot: 7,
-    },
-];
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
