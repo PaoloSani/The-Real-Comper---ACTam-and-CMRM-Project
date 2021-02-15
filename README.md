@@ -20,7 +20,9 @@ Then, set the Tempo and the Tonality of the song. For the moment, you can only c
 After you have set the song parameters, start writing your own progression by clicking on every chord block (which is quarter note long). Add or remove bars by simply clicking + or -. 
 The system is capable of understanding a great variety of chords. A full list of the available chords can be found in the file _chordNotation.txt_.
 By clicking on every chord block you get the representation of the notes over the piano keyboard.
-<img align="right" src="readmeImages/loadSongFromFirebase.PNG" width="50%" style="margin-left:5px;">
+<div style="float:left;margin:0 10px 10px 0" markdown="1">
+    ![loadFromFirebase](readmeImages/loadSongFromFirebase.PNG)
+</div>
 
 
 ## Recording and generating a voicing progression
