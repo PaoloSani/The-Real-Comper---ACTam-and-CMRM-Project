@@ -897,7 +897,8 @@ function SongComponent(){
                             <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
                     )}
                 </div>
-                <DeviceConn/>
+                <img src={defIm} /> 
+                {/* <DeviceConn/> */}
             </div>
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
