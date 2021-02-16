@@ -44,7 +44,7 @@ On the left side of the page you can change some parameters about the song such 
 You can save the song you wrote, and retrive it later! This is powered by [Firebase](https://firebase.google.com/products/firestore)
 
 ![Screenshot](readmeImages/firebase.PNG)
-> firebase databes, organized in two collection, users saved songs are separated from presets
+> Firebase databes, organized in two collection, users saved songs are separated from presets
 
 
 ## Files
@@ -52,10 +52,11 @@ _The Real Comper_ is composed of:
 
 - **index.html**
 - **main.js**
-contains the main js file, containing mainly all the React components
+contains the main js file, containing all the React components
 - **midiRecorder.js**
+handles the MIDI device
 - **songModel.js**
-contains firebase Configuration, Song class (the main modelof the app), function to save and retrive this model from firebase, and other functions to export some data from the class, to be feed into in the player
+contains Firebase Configuration, Song class (the main model of the app), functions to save and retrieve this model from Firebase, and other functions to export some data from the class, to be feed into in the Player
 - **voicingCreator.js**
 implements the algorithm that generat the voicings
 - styles.css, chords_css.css, new_song.css
