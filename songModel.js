@@ -354,7 +354,6 @@ function chartToNoteSequence(songInfo, chart){
 
     // var quarterNoteDuration = 1 / ( songInfo.bpm / 60 )
     var chordTimeStamp = beatsTimeStamp(songInfo, chart)
-    console.log(chordTimeStamp)
 
     var repeat = 0;
 

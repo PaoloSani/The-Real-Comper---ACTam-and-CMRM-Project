@@ -19,19 +19,27 @@ import {beatsTimeStamp} from "./beatsTimeStamp";
 var mAudio = require('./M-AudioKS.png')
 var artMini = require('./ArturiaMinilab.jpg')
 var pearlMallet = require('./PearlMalletstation.png')
+var defIm = require('./defIm.jpeg')
 
 var meters_options = possibleMeters ;
-
 const devices = [
     {
+        manufacturer: 'default',
+        name: 'default',
+        image: defIm,
+    },
+    {
+        manufacturer: 'M-Audio',
         name: 'M-Audio Keystation MK3',
         image: mAudio,
     },
     {
+        manufacturer: 'Arturia',
         name: 'Arturia Minilab MKII',
         image: artMini,
     },
     {
+        manufacturer: 'Pearl',
         name: 'Pearl Malletstation',
         image: pearlMallet,
     }
@@ -757,13 +765,42 @@ function Buttons(props) {
  * Show connected MIDI device
  */
 function DeviceConn() {
-    var devName = midiRecorder.getInputName();
-    console.log(devName)
+    const [imName, setImName] = useState(() => midiRecorder.getInputName().split(' ')[0])
+    const [imSource, setImSource] = useState(() => devices[0].image)
+
+    const [count, setCount] = useState( () => 0)
+
+    useEffect(
+        () => {
+            if(imName !== midiRecorder.getInputName().split(' ')[0]) {
+                let name = 'default';
+                let image = devices[0].image;
+
+                for (let i = 0; i < devices.length; i++ ){
+                    if ( devices[i].manufacturer === midiRecorder.getInputName().split(' ')[0]){
+                        console.log(devices[i].manufacturer)
+                        console.log(midiRecorder.getInputName().split(' ')[0])
+                        name = devices[i].name;
+                        image = devices[i].image.toString()
+                    }
+                }
+                setImName(name);
+                setImSource([image]);
+            }
+        }, [count]
+    )
+
+    if(count < 1) {
+        setTimeout(() => {
+            setCount(count + 1);
+        }, 1000);
+    }
+
 
     return(
         <div>
-            <h3>{devName}</h3>
-            <img src={mAudio} alt="M-Audio Keystation"/>
+            <h3>{imName}</h3>
+            <img src={imSource} width="300" height="200"/>
         </div>
     )
 }
@@ -833,8 +870,8 @@ function SongComponent(){
                     <div>
                         <label key={'tempo-title'}>Tempo:</label>
                         <span key={'bpm-title'} id="music-note">
-                           ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220"  value={bpm} onChange={showBPM}/>
-                       </span>
+                        ♩= <input key={'bpm-song'} type="number" id="bpm" name="bpm" min="60" max="220" value={bpm} onChange={showBPM}/>
+                    </span>
                     </div>
                     <div key={'key-opts'} id="key-opts">
                         <label key={'tonality-title'} id="key">Key:</label>
@@ -847,16 +884,14 @@ function SongComponent(){
                     </div>
                 </div>
 
-            <div id="control-buttons">
-                {bank.map(
-                    (btn, index) =>
-                        <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
-                )}
+                <div id="control-buttons">
+                    {bank.map(
+                        (btn, index) =>
+                            <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
+                    )}
+                </div>
+                <DeviceConn/>
             </div>
-
-            <DeviceConn/>
-        </div>
-
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
             <LoadSongModal isOpen={modalCaller} setModalCaller={setModalCaller} setNewSongLoading={setNewSongLoading}/>
