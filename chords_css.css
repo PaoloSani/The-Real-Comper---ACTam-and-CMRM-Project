@@ -64,7 +64,7 @@
 
 .chord-block.right {
     border-radius: 0 4px 4px 0;
-    border-right: 0;
+    border-right: 2px solid black;
 }
 
 .end-bar{
@@ -83,6 +83,8 @@
     display: inline-flex;
     width: fit-content;
     max-width: 100%;
+    border-right: 2px solid black;
+
 }
 
 
