@@ -684,9 +684,16 @@ function Buttons(props) {
 
     const startRecording = () => {
         document.getElementById("record").style.color = "red";
-        player.start();
-        setRecording(true);
-        midiRecorder.setRecording(true);
+        player.noteSequence = chartToNoteSequence(songInfo, chart)
+        if ( props.metronome) {
+            getMetronome(songInfo, chart).notes.forEach(i=>player.noteSequence.notes.push(i));
+        }
+        setTimeout(() => {
+            player.start();
+            setRecording(true);
+            midiRecorder.setRecording(true);
+        }, 500);
+
     }
 
     const stopRecording = () => {
