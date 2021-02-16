@@ -5,9 +5,7 @@ function beatsTimeStamp(songInfo, chart){
     var slot = songInfo.meterType.slot;
 
     var durationRatio =  songInfo.meterType.durationRatio[ songInfo.meterType.signatures_set.indexOf(songInfo.meter) ]
-    console.log(songInfo.meterType.signatures_set.indexOf(songInfo.meter))
-    console.log('duration ratio', durationRatio)
-    console.log(songInfo)
+
 
     var currentTimeStamp = 0;
     var timeStamp = [currentTimeStamp];

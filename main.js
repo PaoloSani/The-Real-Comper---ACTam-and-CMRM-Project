@@ -199,7 +199,6 @@ function ChordEditor(props){
 
                                 } catch (TypeError) {
                                     document.getElementById("custom-chord-input").value = 'invalid chord';
-                                    console.log('catch')
                                 }
 
                             }
@@ -570,7 +569,6 @@ function LoadSongModal(props){
         song.exportSongInfo(songInfo)
         chart = {}
         song.exportSongChart(chart)
-        console.log('i want to call the update function', songInfo, chart)
         props.setNewSongLoading(true)
         closeModal()
     }
@@ -606,7 +604,6 @@ function LoadSongModal(props){
     // .then(setVariable( songList.map(song => console.log(song._title))));
 
     function setVariable(list) {
-        console.log(list)
         setTimeout(() => setModalSongList(list), 10000)
     }
 

@@ -261,7 +261,7 @@ class Song{
         // put collection to song if not specified
         collectionName = (collectionName === ("presets") | collectionName === ("songs")) ? collectionName : "songs"
         return db.collection(collectionName).doc(songTitle).get().then(function(doc){
-            console.log('loading from firebase')
+            // console.log('loading from firebase')
             return Song.parseSong(doc.data())
         });
     }
