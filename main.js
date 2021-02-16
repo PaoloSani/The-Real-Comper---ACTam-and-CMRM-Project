@@ -736,53 +736,6 @@ function Buttons(props) {
     )
 }
 
-
-
-
-/**
- * Show connected MIDI device
- */
-function DeviceConn() {
-    const [imName, setImName] = useState(() => midiRecorder.getInputName().split(' ')[0])
-    const [imSource, setImSource] = useState(() => devices[0].image)
-
-    const [count, setCount] = useState( () => 0)
-
-    useEffect(
-        () => {
-            if(imName !== midiRecorder.getInputName().split(' ')[0]) {
-                let name = 'default';
-                let image = devices[0].image;
-
-                for (let i = 0; i < devices.length; i++ ){
-                    if ( devices[i].manufacturer === midiRecorder.getInputName().split(' ')[0]){
-                        console.log(devices[i].manufacturer)
-                        console.log(midiRecorder.getInputName().split(' ')[0])
-                        name = devices[i].name;
-                        image = devices[i].image.toString()
-                    }
-                }
-                setImName(name);
-                setImSource([image]);
-            }
-        }, [count]
-    )
-
-    if(count < 1) {
-        setTimeout(() => {
-            setCount(count + 1);
-        }, 1000);
-    }
-
-
-    return(
-        <div>
-            <h3>{imName}</h3>
-            <img src={imSource} width="300" height="200"/>
-        </div>
-    )
-}
-
 /**
  * SongComponent is the general React component for the app, it manages the general info of the song and act a Parent component for communicating children
  */
@@ -869,7 +822,6 @@ function SongComponent(){
                     )}
                 </div>
                 <img src={defIm} /> 
-                {/* <DeviceConn/> */}
             </div>
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
 
