@@ -2,10 +2,10 @@
 ## What is the Real Comper?
 <img align="left" src="readmeImages/MAE logo.PNG"  width="10%" style="margin-left:5px; margin-bottom:10px">
 _The Real Comper_ is a web app which chooses chord voicing solutions for a given melody over a chord progression written by the user.
-The project has been developed as part of two courses in the [Music and Acoustic Engineeering master](https://suono.polimi.it/) degree, of the [Politecnico di Milano](https://www.polimi.it/). The courses are [Computer Music Representation and Models](https://www4.ceda.polimi.it/manifesti/manifesti/controller/ManifestoPublic.do?EVN_DETTAGLIO_RIGA_MANIFESTO=evento&aa=2020&k_cf=225&k_corso_la=263&k_indir=MMI&codDescr=054282&lang=IT&semestre=1&anno_corso=1&idItemOfferta=150885&idRiga=258372), and [Advanced Coding Tool and Methodologies](https://www4.ceda.polimi.it/manifesti/manifesti/controller/ManifestoPublic.do?EVN_DETTAGLIO_RIGA_MANIFESTO=evento&aa=2018&k_cf=225&k_corso_la=263&k_indir=MCR&codDescr=052828&lang=IT&semestre=1&anno_corso=1&idItemOfferta=139981&idRiga=235525).
+The project has been developed as part of two courses in the [Music and Acoustic Engineeering master](https://suono.polimi.it/) degree, of the 
+<img align="right" src="https://upload.wikimedia.org/wikipedia/en/b/be/Logo_Politecnico_Milano.png"  width="30%" style="margin-left:5px; margin-bottom:10px"> [Politecnico di Milano](https://www.polimi.it/). The courses are [Computer Music Representation and Models](https://www4.ceda.polimi.it/manifesti/manifesti/controller/ManifestoPublic.do?EVN_DETTAGLIO_RIGA_MANIFESTO=evento&aa=2020&k_cf=225&k_corso_la=263&k_indir=MMI&codDescr=054282&lang=IT&semestre=1&anno_corso=1&idItemOfferta=150885&idRiga=258372), and [Advanced Coding Tool and Methodologies](https://www4.ceda.polimi.it/manifesti/manifesti/controller/ManifestoPublic.do?EVN_DETTAGLIO_RIGA_MANIFESTO=evento&aa=2018&k_cf=225&k_corso_la=263&k_indir=MCR&codDescr=052828&lang=IT&semestre=1&anno_corso=1&idItemOfferta=139981&idRiga=235525).
 
 <a href="http://www.youtube.com/watch?v=diBw8wk2pe8"><img align="left" src="readmeImages/yt demo.PNG"  width="20%" style="margin-left:5px; margin-bottom:10px"></a>
-<img align="right" src="https://upload.wikimedia.org/wikipedia/en/b/be/Logo_Politecnico_Milano.png"  width="30%" style="margin-left:5px; margin-bottom:10px">
 An example of that app is hosted [here](https://comper.surge.sh/)
 <br><br><br><br><br>
 
