@@ -43,9 +43,9 @@ function beatsTimeStamp(songInfo, chart){
     // var durationRatio = songInfo.durationRatio; // e.g. [1,1,1,5/4]
     var durationRatio =  songInfo.meterType.durationRatio[ songInfo.meterType.signatures_set.indexOf(songInfo.meter) ]
     // var durationRatio =  songInfo.meterType.durationRatio[ 2 ]
-    console.log(songInfo.meterType.signatures_set.indexOf(songInfo.meter))
-    console.log('duration ratio', durationRatio)
-    console.log(songInfo)
+    // console.log(songInfo.meterType.signatures_set.indexOf(songInfo.meter))
+    // console.log('duration ratio', durationRatio)
+    // console.log(songInfo)
 
     var currentTimeStamp = 0;
     var timeStamp = [currentTimeStamp];
@@ -59,7 +59,7 @@ function beatsTimeStamp(songInfo, chart){
         currentTimeStamp += quarterNoteDuration * durationRatio[ i % slot ]
         timeStamp.push(Number(currentTimeStamp.toFixed(5)));
     }
-    console.log(timeStamp)
+    // console.log(timeStamp)
 
     return timeStamp;
 

@@ -100,7 +100,6 @@ function drop(chord, type){
         newVoicing.push(name+degree);
     }
 
-    console.log('Here problems: ',newVoicing)
 
     chord.voicing(newVoicing)
 
@@ -154,7 +153,6 @@ function createVoicing(curr, prev, melody, quarterNote){
     let currVoicing = curr.voicing().map( i => i.toString());
     let newVoicing = teoria.chord(curr.name).voicing();
     let cost, minCost, idx;
-    console.log(curr)
     // remove notes / add notes according to the melody
     if ( currVoicing.length > 4 ){
         let idx = currVoicing.indexOf('P5')
@@ -164,7 +162,6 @@ function createVoicing(curr, prev, melody, quarterNote){
         if( currVoicing.length > 4 ){
             let noteToRemove = longSustainedNotes(melody, quarterNote);
             noteToRemove = noteToRemove.filter( (item, pos, noteToRemove) => { return noteToRemove.indexOf(item) === pos;} )
-            console.log(noteToRemove)
 
             for ( let i = 0; i < noteToRemove.length; i++ ){
                 let idx = currVoicing.indexOf(noteToRemove[i])
@@ -176,7 +173,6 @@ function createVoicing(curr, prev, melody, quarterNote){
         }
     }
     curr.voicing(currVoicing)
-    console.log(currVoicing)
 
     let toEdit = teoria.chord(curr.name);
     toEdit.voicing(currVoicing)
@@ -194,7 +190,6 @@ function createVoicing(curr, prev, melody, quarterNote){
     minCost = Math.min(...cost);
     idx = cost.indexOf(minCost) + 1;
 
-    console.log('Chord: ', curr.name + ' ' + idx) //prints the selected voicing for a chord
 
 
     if ( curr === prev ){
@@ -205,7 +200,6 @@ function createVoicing(curr, prev, melody, quarterNote){
     }
 
 
-    console.log(newVoicing.map(i=>i.toString()))
 
     return newVoicing.map(i=>i.toString());
 }

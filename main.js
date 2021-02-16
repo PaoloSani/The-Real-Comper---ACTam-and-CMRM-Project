@@ -14,6 +14,7 @@ import Modal from "react-modal";
 import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
 import {beatsTimeStamp} from "./beatsTimeStamp";
+import {useCallback} from "react/cjs/react.production.min";
 
 /* ---------- Import device images ---------- */
 var mAudio = require('./M-AudioKS.png')
@@ -803,34 +804,34 @@ function DeviceConn() {
     const [imName, setImName] = useState(() => midiRecorder.getInputName().split(' ')[0])
     const [imSource, setImSource] = useState(() => devices[0].image)
 
+    const [count, setCount] = useState( () => 0)
+
     useEffect(
         () => {
-            if(imName != midiRecorder.getInputName().split(' ')[0]) {
-                devices.forEach(dev =>
-                    {if(dev.manufacturer === midiRecorder.getInputName().split(' ')[0]) {
-                        setImName([dev.name])
-                        setImSource([dev.image.toString()])
-                    }})
+            if(imName !== midiRecorder.getInputName().split(' ')[0]) {
+                let name = 'default';
+                let image = devices[0].image;
+
+                for (let i = 0; i < devices.length; i++ ){
+                    if ( devices[i].manufacturer === midiRecorder.getInputName().split(' ')[0]){
+                        console.log(devices[i].manufacturer)
+                        console.log(midiRecorder.getInputName().split(' ')[0])
+                        name = devices[i].name;
+                        image = devices[i].image.toString()
+                    }
+                }
+                setImName(name);
+                setImSource([image]);
             }
-        }, []
+        }, [count]
     )
 
-    // useEffect(
-    //     () => {
-    //         devices.forEach(dev => {if(dev.manufacturer === imName) {setImSource([dev.image.toString()])} })
-    //         console.log(imName)
-    //     }, [imName]
-    // )
+    if(count < 1) {
+        setTimeout(() => {
+            setCount(count + 1);
+        }, 1000);
+    }
 
-    // const setImage = () => {
-    //     var imDev = defIm
-    //     for(let dev in devices){
-    //         if(dev.manufacturer === imName){
-    //             imDev = dev.image
-    //         }
-    //     }
-    //     return(imDev)
-    // }
 
     return(
         <div>
@@ -896,7 +897,7 @@ function SongComponent(){
                     <h2 key={'song-title'}>{title}</h2>
                     <div key={'meters-option'} id="mtrs-opts">
                         <label key={'meter-title'}>Meter:</label>
-                        <select key={'select-meter'} id="meters" name="meters" defaultValue={songInfo.meter} value={meter} onChange={showMeter}>
+                        <select key={'select-meter'} id="meters" name="meters"  value={meter} onChange={showMeter}>
                             {meterType.signatures_set.map((mtrs, index) =>
                                 <option key={'meter-options'+index} value={mtrs}>{mtrs}</option>
                             )}
