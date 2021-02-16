@@ -334,7 +334,7 @@ function chordToNoteSequence(midiChord, start, end){
     }
     midiChord.forEach(i => chordNoteSequence.notes.push(
         {
-            pitch: i, startTime: start, endTime: end
+            pitch: i, startTime: start, endTime: end, /*velocity: 50*/
         }
     ))
     return chordNoteSequence

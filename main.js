@@ -296,7 +296,7 @@ function ChordBlock(props){
 
     return (
         <div key={'chord-num'+props.index} className={className(props.index, props.slot, props.isPlaying)} onClick={show} >
-            <i key={'icon' + props.index} className="far fa-edit icon-edit" onClick={editChord}/>
+            <i key={'icon' + props.index} className="material-icons icon-edit" onClick={editChord}>{'drive_file_rename_outline'}</i>
             <div key={'name'+props.index} className={"chord"}>{props.name}</div>
             {props.name !== '%' && (
                 <div key={'degree'+props.index} className={"degree"}>{props.degree}</div>
@@ -868,7 +868,7 @@ function SongComponent(){
                             <Buttons key={index} btn={btn} openModal={setModalCaller} openNew={setModalNew} generateVoicing={setNewVoicing} setMetronome={setMetronome} metronome={metronome}/>
                     )}
                 </div>
-                <img src={defIm} /> 
+                <img src={defIm} />
                 {/* <DeviceConn/> */}
             </div>
             <NewSongInfo isNewOpen={modalNew} setModalNew={setModalNew} setTitle={setTitle} setGlob_tonality={setGlob_tonality} setBpm={setBpm} setMeter={setMeter} setMeterType={setMeterType} setNewSongLoading={setNewSongLoading}/>
