@@ -256,3 +256,10 @@ div.ReactModalPortal > :first-child {
   height: 100vh;
   overflow-y: scroll;
 }
+
+@font-face {
+  font-family: 'Baby Kruffy';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Baby Kruffy'), url('https://fonts.cdnfonts.com/s/1233/BABYK___.woff') format('woff');
+}

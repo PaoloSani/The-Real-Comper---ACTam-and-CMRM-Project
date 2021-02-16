@@ -7,7 +7,6 @@
         <link rel="stylesheet" href="new_song.css">
         <!-- Font -->
         <link rel="preconnect" href="https://fonts.gstatic.com">
-        <link href="http://fonts.cdnfonts.com/css/baby-kruffy" rel="stylesheet">
         <link href="https://fonts.googleapis.com/css2?family=Indie+Flower&display=swap" rel="stylesheet">
         <!-- Icons -->
         <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -25,17 +24,13 @@
 
     <body>
         <div id="comper"></div>
-        <!-- Load React. -->
-        <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+
         <div id="piano-roll">
             <midi-visualizer
                     type="waterfall"
                     src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">
             </midi-visualizer>
-            <!--            <midi-visualizer-->
-            <!--                    type="staff"-->
-            <!--                    src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid">-->
-            <!--            </midi-visualizer>-->
+
             <midi-player
                     src="https://cdn.jsdelivr.net/gh/cifkao/html-midi-player@2b12128/twinkle_twinkle.mid"
                     sound-font visualizer="#piano-roll midi-visualizer" id="midi-player1">

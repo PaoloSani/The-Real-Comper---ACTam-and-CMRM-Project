@@ -15,37 +15,11 @@ import {midiRecorder} from "./midiRecorder";
 import {createProgression} from "./voicingCreator";
 import {beatsTimeStamp} from "./beatsTimeStamp";
 
-/* ---------- Import device images ---------- */
-var mAudio = require('./M-AudioKS.png')
-var artMini = require('./ArturiaMinilab.jpg')
-var pearlMallet = require('./PearlMalletstation.png')
-var defIm = require('./defIm.jpeg')
+/* ---------- Import images ---------- */
+var defIm = require('./readmeImages/defIm.jpeg')
+
 
 var meters_options = possibleMeters ;
-const devices = [
-    {
-        manufacturer: 'default',
-        name: 'default',
-        image: defIm,
-    },
-    {
-        manufacturer: 'M-Audio',
-        name: 'M-Audio Keystation MK3',
-        image: mAudio,
-    },
-    {
-        manufacturer: 'Arturia',
-        name: 'Arturia Minilab MKII',
-        image: artMini,
-    },
-    {
-        manufacturer: 'Pearl',
-        name: 'Pearl Malletstation',
-        image: pearlMallet,
-    }
-];
-
-/* ---------- Model/View Meter Options ---------- */
 
 /* ---------- Model/View Key Options ---------- */
 const key_options = [
