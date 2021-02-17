@@ -340,12 +340,14 @@ function ChordChart(props){
     const addBar = () => {
         song.addBar()
         song.exportSongChart(chart)
+        midiRecorder.cleanNoteSequence()
         updateStates()
     }
 
     const removeBar =  () => {
         song.removeBar()
         song.exportSongChart(chart)
+        midiRecorder.cleanNoteSequence()
         updateStates()
     }
 
@@ -400,6 +402,7 @@ function ChordChart(props){
                 createProgression(song, midiRecorder.getNoteSequence())
                 song.exportSongChart(chart)
                 updateStates()
+                midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
                 props.setNewVoicing(false)
             }
         }, [props.newVoicing]

@@ -94,7 +94,12 @@ var midiRecorder = {
 
     getInputName(){
         return this.inputName;
+    },
+
+    cleanNoteSequence(){
+        this.noteSequence.notes = [];
     }
+
 };
 
 export {midiRecorder}
