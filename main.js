@@ -283,7 +283,7 @@ function ChordBlock(props){
     }
 
     const playChord = () => {
-        player.noteSequence = chordToNoteSequence(chart.MIDInote[props.index], 0, 3)
+        player.noteSequence = chordToNoteSequence(chart.MIDInote[props.index], 0, 0.5)
         player.stop()
         // Tone.Transport.clear()
         Tone.Transport.stop()
@@ -291,7 +291,7 @@ function ChordBlock(props){
         setTimeout(function () {
             player.noteSequence = chartToNoteSequence(songInfo, chart);
             midiRecorder.getNoteSequence().notes.forEach(i => player.noteSequence.notes.push(i))
-        }, 3000);
+        }, 500);
     }
 
     return (
