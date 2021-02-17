@@ -141,6 +141,35 @@ function longSustainedNotes(melody, quarterNote){
 }
 
 /**
+ * notesThatClash return an array of possible notes of the chord that are in contrast with the melody
+ * @param voicing: the voicing of the chord
+ * @param melody: the melody played over the chord
+ * @param quarterNote: the quarter note time duration
+ * @return {[]}: an array of notes (intervals) to remove
+ */
+function notesThatClash(voicing, melody, quarterNote){
+    let possibleClash = (melody.filter( i => i.duration >= quarterNote )).map( i => i.value); // not passing notes
+    //avoid repetitions
+    possibleClash = possibleClash.filter( (item, pos, noteToRemove) => { return noteToRemove.indexOf(item) === pos;} )
+
+    let realClash = [];
+
+    if ( voicing.includes('P5') && ( possibleClash.includes('d5') || possibleClash.includes('A5'))){
+        realClash.push('P5');
+    }
+
+    if ( voicing.includes('M9') && ( possibleClash.includes('m9') )){
+        realClash.push('M9')
+    }
+
+    if ( voicing.includes('M13') && ( possibleClash.includes('m13') )){
+        realClash.push('M13')
+    }
+
+    return realClash;
+}
+
+/**
  * createVoicing generates the voicing for a given chord
  * @param curr: the chord over which executing the calculation
  * @param prev: the previous chord of the progression (already voiced)
@@ -154,13 +183,24 @@ function createVoicing(curr, prev, melody, quarterNote){
     let newVoicing = teoria.chord(curr.name).voicing();
     let cost, minCost, idx;
     // remove notes / add notes according to the melody
+
+    // remove notes that clash with the melody
+    let noteToRemove = notesThatClash(currVoicing, melody,quarterNote);
+
+    for ( let i = 0; i < noteToRemove.length; i++ ){
+        let idx = currVoicing.indexOf(noteToRemove[i])
+
+        if ( idx !== -1 ){
+            currVoicing.splice(idx, 1);
+        }
+    }
+
     if ( currVoicing.length > 4 ){
         let idx = currVoicing.indexOf('P5')
         currVoicing.splice(idx, 1);
 
-
         if( currVoicing.length > 4 ){
-            let noteToRemove = longSustainedNotes(melody, quarterNote);
+            noteToRemove = longSustainedNotes(melody, quarterNote);
             noteToRemove = noteToRemove.filter( (item, pos, noteToRemove) => { return noteToRemove.indexOf(item) === pos;} )
 
             for ( let i = 0; i < noteToRemove.length; i++ ){
