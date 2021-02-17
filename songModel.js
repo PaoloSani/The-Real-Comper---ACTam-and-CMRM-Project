@@ -39,22 +39,24 @@ const meters_options = [
     },
     {
         group: 'Group B',
-        signatures_set: ['3/4', '7/8'],
-        durationRatio: [
-            [1,1,1],
-            [1,1,3/2]],
+        signatures_set: ['3/4', '7/8','8/8','11/8'],
+        durationRatio: {
+            0: [1,1,1],
+            1: [1,1,3/2],
+            2: [1,1,2/3],
+            3: [1,1,3/4]},
         slot: 3,
     },
     {
         group: 'Group C',
         signatures_set: ['5/4'],
-        durationRatio: [[1,1,1,1,1]],
+        durationRatio: {0: [1,1,1,1,1]},
         slot: 5,
     },
     {
         group: 'Group D',
         signatures_set: ['7/4'],
-        durationRatio: [[1,1,1,1,1,1,1]],
+        durationRatio: {0: [1,1,1,1,1,1,1]},
         slot: 7,
     },
 ]
