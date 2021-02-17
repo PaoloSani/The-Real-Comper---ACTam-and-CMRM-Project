@@ -257,6 +257,10 @@ function createProgression( song, melodyNoteSequence ){
     let chordStart, chordEnd;
     let root, intervals;
     let newVoicing;
+    let songInfo = {};
+    song.exportSongInfo(songInfo);
+    let chart = {};
+    song.exportSongChart(chart);
 
 
     for ( let i = 0; i < song.Chart.length; i++ ){
@@ -273,8 +277,9 @@ function createProgression( song, melodyNoteSequence ){
 
             // chordStart = (i-repeat)*quarterNote;
             // chordEnd = (i+1)*quarterNote;
-            chordStart = beatsTimeStamp[i-repeat];
-            chordEnd = beatsTimeStamp[i+1];
+
+            chordStart = beatsTimeStamp(songInfo, chart)[i-repeat];
+            chordEnd = beatsTimeStamp(songInfo, chart)[i+1];
 
             // take the intervals of the notes played over the chord with respect to the root
             root = currChord.root;
@@ -285,6 +290,8 @@ function createProgression( song, melodyNoteSequence ){
                 duration: (parseFloat(i.startTime) + parseFloat(i.endTime)).toFixed(3),
                 }}
             );
+
+
 
             newVoicing = createVoicing(currChord, prevChord, intervals, quarterNote);
 
