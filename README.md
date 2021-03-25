@@ -6,7 +6,7 @@ The project has been developed as part of two courses in the <a href="https://su
 <img align="right" src="https://upload.wikimedia.org/wikipedia/en/b/be/Logo_Politecnico_Milano.png"  width="30%" style="margin-left:5px; margin-bottom:10px">
 The courses are <a href="https://www4.ceda.polimi.it/manifesti/manifesti/controller/ManifestoPublic.do?EVN_DETTAGLIO_RIGA_MANIFESTO=evento&aa=2020&k_cf=225&k_corso_la=263&k_indir=MMI&codDescr=054282&lang=IT&semestre=1&anno_corso=1&idItemOfferta=150885&idRiga=258372">Computer Music Representation and Models</a>, and <a href="https://www4.ceda.polimi.it/manifesti/manifesti/controller/ManifestoPublic.do?EVN_DETTAGLIO_RIGA_MANIFESTO=evento&aa=2018&k_cf=225&k_corso_la=263&k_indir=MCR&codDescr=052828&lang=IT&semestre=1&anno_corso=1&idItemOfferta=139981&idRiga=235525">Advanced Coding Tool and Methodologies</a>.
 
-<a href="http://www.youtube.com/watch?v=diBw8wk2pe8"><img align="left" src="readmeImages/yt demo.PNG"  width="20%" style="margin-left:5px; margin-bottom:10px"></a>
+<a href="https://youtu.be/qwCiZa5k7nc"><img align="left" src="readmeImages/yt demo.PNG"  width="20%" style="margin-left:5px; margin-bottom:10px"></a>
 An example of that app is hosted [here](https://comper.surge.sh/)
 <br><br><br><br><br>
 
